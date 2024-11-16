@@ -23,6 +23,7 @@ contract WeightedVoting is ERC20 {
     error VotingClosed();
     error InvalidVote();
     struct Issue {
+        uint256 id;
         EnumerableSet.AddressSet voters;
         string issueDesc;
         uint256 quorum;
@@ -35,6 +36,7 @@ contract WeightedVoting is ERC20 {
     }
 
     struct ReturnIssue {
+        uint256 id;
         address[] voters;
         string issueDesc;
         uint256 quorum;
@@ -75,12 +77,14 @@ contract WeightedVoting is ERC20 {
         Issue storage newIssue = issues.push();
         newIssue.issueDesc = issueDesc;
         newIssue.quorum = quorum;
-        return issues.length - 1;
+        newIssue.id = issues.length - 1;
+        return newIssue.id;
     }
 
     function getIssue(uint256 index) public view returns (ReturnIssue memory) {
         Issue storage issue = issues[index];
         return ReturnIssue({
+            id: issue.id,
             voters: issue.voters.values(),
             issueDesc: issue.issueDesc,
             quorum: issue.quorum,
@@ -93,7 +97,7 @@ contract WeightedVoting is ERC20 {
         });
     }
 
-    function vote(uint256 issueId, Vote vote) external {
+    function vote(uint256 issueId, Vote _vote) external {
         Issue storage issue = issues[issueId];
         if (issue.closed) {
             revert VotingClosed();
@@ -106,11 +110,11 @@ contract WeightedVoting is ERC20 {
         issue.voters.add(msg.sender);
         issue.totalVotes += balanceOf(msg.sender);
 
-        if (vote == Vote.FOR) {
+        if (_vote == Vote.FOR) {
             issue.votesFor += balanceOf(msg.sender);
-        } else if (vote == Vote.AGAINST) {
+        } else if (_vote == Vote.AGAINST) {
             issue.votesAgainst += balanceOf(msg.sender);
-        } else if (vote == Vote.ABSTAIN) {
+        } else if (_vote == Vote.ABSTAIN) {
             issue.votesAbstain += balanceOf(msg.sender);
         } else {
             revert InvalidVote();
@@ -130,7 +134,7 @@ contract WeightedVoting is ERC20 {
 
     function getAllIssues() external view returns (ReturnIssue[] memory) {
         ReturnIssue[] memory allIssues = new ReturnIssue[](issues.length);
-        for (uint i = 0; i < issues.length; i++) {
+        for (uint i = 1; i < issues.length; i++) {
             allIssues[i] = getIssue(i);
         }
         return allIssues;
