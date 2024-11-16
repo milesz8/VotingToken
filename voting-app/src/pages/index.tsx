@@ -6,7 +6,7 @@ import styles from '../styles/Home.module.css';
 import { ConnectionWindow } from '../components/ConnectionWindow';
 import { IssueList } from '../components/IssueList';
 import { TokenInfo } from '../components/TokenInfo';
-
+import { CreateIssue } from '../components/CreateIssue';
 const Home: NextPage = () => {
   return (
     <div className={styles.container}>
@@ -14,6 +14,7 @@ const Home: NextPage = () => {
         <ConnectButton />
         <ConnectionWindow />
         <TokenInfo />
+        <CreateIssue />
         <IssueList />
       </main>
     </div>
