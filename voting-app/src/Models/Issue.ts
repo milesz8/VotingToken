@@ -1,4 +1,5 @@
 interface Issue {
+    id: number;
     voters: string[];
     issueDesc: string;
     votesFor: bigint;
