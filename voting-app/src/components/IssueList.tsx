@@ -1,7 +1,8 @@
 import { useReadContract, useWriteContract, useBlockNumber } from 'wagmi';
 import React, { useState, useEffect, } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import contractData from '../deployments/FEWeightedVoting.json';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 
 export function IssueList() {
     const queryClient = useQueryClient();
@@ -31,8 +32,8 @@ export function IssueList() {
         isFetching: issuesIsFetching,
         queryKey: issuesQueryKey,
       } = useReadContract({
-        address: contractData.address as `0x${string}`,
-        abi: contractData.abi,
+        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+        abi: weightedVoting.abi,
         functionName: 'getAllIssues',
       });
 
@@ -58,8 +59,8 @@ export function IssueList() {
 
     const handleVote = (issueId: number, voteType: number) => {
         vote({
-            address: contractData.address as `0x${string}`,
-            abi: contractData.abi,
+            address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+            abi: weightedVoting.abi,
             functionName: "vote",
             args: [BigInt(issueId), BigInt(voteType)],
         });
@@ -70,6 +71,7 @@ export function IssueList() {
         return issues.map((issue) => (
             <div key={issue.issueDesc}>
                 <h3>{issue.issueDesc}</h3>
+                <p>{'ID: ' + issue.id.toString()}</p>
                 <p>{'Voters: ' + issue.voters.toString()}</p>
                 <p>{'Votes For: ' + issue.votesFor.toString()}</p>
                 <p>{'Votes Against: ' + issue.votesAgainst.toString()}</p>

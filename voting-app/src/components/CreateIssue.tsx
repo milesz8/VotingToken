@@ -1,5 +1,6 @@
 import { useWriteContract } from 'wagmi';
-import contractData from '../deployments/FEWeightedVoting.json';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { useState } from 'react';
 
 export function CreateIssue() {
@@ -11,8 +12,8 @@ export function CreateIssue() {
         if (!issueDesc || !quorum) return;
         
         createIssue({
-            address: contractData.address as `0x${string}`,
-            abi: contractData.abi,
+            address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+            abi: weightedVoting.abi,
             functionName: "createIssue",
             args: [issueDesc, BigInt(quorum)],
         });

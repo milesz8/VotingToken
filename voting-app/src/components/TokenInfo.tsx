@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAccount, useReadContract, useBlockNumber, useWriteContract, useSimulateContract } from 'wagmi';
-import contractData from '../deployments/FEWeightedVoting.json';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function TokenInfo() {
@@ -13,8 +14,8 @@ export function TokenInfo() {
         isFetching: claimIsFetching,
         isError: claimIsError,
       } = useSimulateContract({
-        address: contractData.address as `0x${string}`,
-        abi: contractData.abi,
+        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+        abi: weightedVoting.abi,
         functionName: 'claim',
       });
 
@@ -22,8 +23,8 @@ export function TokenInfo() {
 
     const { data: balanceData, queryKey: balanceQueryKey } = 
         useReadContract({ 
-            address: contractData.address as `0x${string}`,
-            abi: contractData.abi,
+            address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+            abi: weightedVoting.abi,
             functionName: "balanceOf",
             args: [useAccount().address]
         });
