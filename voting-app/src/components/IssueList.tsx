@@ -4,6 +4,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 
+enum Vote {
+    FOR = 0,
+    AGAINST = 1,
+    ABSTAIN = 2
+}
+
 export function IssueList() {
     const queryClient = useQueryClient();
 
@@ -57,7 +63,7 @@ export function IssueList() {
 
     const { writeContract: vote, isPending: voteIsPending } = useWriteContract();
 
-    const handleVote = (issueId: number, voteType: number) => {
+    const handleVote = (issueId: number, voteType: Vote) => {
         vote({
             address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
             abi: weightedVoting.abi,
@@ -81,19 +87,19 @@ export function IssueList() {
                 <p>{'Closed: ' + issue.closed}</p>
                 <div>
                     <button 
-                        onClick={() => handleVote(issue.id, 1)}
+                        onClick={() => handleVote(issue.id, Vote.FOR)}
                         disabled={issue.closed || voteIsPending}
                     >
                         {voteIsPending ? 'Voting...' : 'Vote For'}
                     </button>
                     <button
-                        onClick={() => handleVote(issue.id, 2)} 
+                        onClick={() => handleVote(issue.id, Vote.AGAINST)} 
                         disabled={issue.closed || voteIsPending}
                     >
                         {voteIsPending ? 'Voting...' : 'Vote Against'}
                     </button>
                     <button
-                        onClick={() => handleVote(issue.id, 0)}
+                        onClick={() => handleVote(issue.id, Vote.ABSTAIN)}
                         disabled={issue.closed || voteIsPending}
                     >
                         {voteIsPending ? 'Voting...' : 'Abstain'}
