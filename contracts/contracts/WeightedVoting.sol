@@ -10,6 +10,7 @@ contract WeightedVoting is ERC20 {
 
     Issue[] private issues;
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+        issues.push();
     }
 
     uint public maxSupply = 1000000;
@@ -133,9 +134,9 @@ contract WeightedVoting is ERC20 {
     }
 
     function getAllIssues() external view returns (ReturnIssue[] memory) {
-        ReturnIssue[] memory allIssues = new ReturnIssue[](issues.length);
+        ReturnIssue[] memory allIssues = new ReturnIssue[](issues.length - 1);
         for (uint i = 1; i < issues.length; i++) {
-            allIssues[i] = getIssue(i);
+            allIssues[i - 1] = getIssue(i);
         }
         return allIssues;
     }
