@@ -1,4 +1,4 @@
-import { useReadContract, useBlockNumber } from 'wagmi';
+import { useReadContract, useWriteContract, useBlockNumber } from 'wagmi';
 import React, { useState, useEffect, } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import contractData from '../deployments/FEWeightedVoting.json';
@@ -54,17 +54,49 @@ export function IssueList() {
         queryClient.invalidateQueries({ queryKey: issuesQueryKey });
       }, [blockNumber, queryClient]);
 
+    const { writeContract: vote, isPending: voteIsPending } = useWriteContract();
+
+    const handleVote = (issueId: number, voteType: number) => {
+        vote({
+            address: contractData.address as `0x${string}`,
+            abi: contractData.abi,
+            functionName: "vote",
+            args: [BigInt(issueId), BigInt(voteType)],
+        });
+    };
+
     function renderIssues() {
+
         return issues.map((issue) => (
             <div key={issue.issueDesc}>
-            <h3>{issue.issueDesc}</h3>
-            <p>{'Voters: ' + issue.voters.toString()}</p>
-            <p>{'Votes For: ' + issue.votesFor.toString()}</p>
-            <p>{'Votes Against: ' + issue.votesAgainst.toString()}</p>
-            <p>{'Votes Abstain: ' + issue.votesAbstain.toString()}</p>
-            <p>{'Quorum: ' + issue.quorum.toString()}</p>
-            <p>{'Passed: ' + issue.passed}</p>
-            <p>{'Closed: ' + issue.closed}</p>
+                <h3>{issue.issueDesc}</h3>
+                <p>{'Voters: ' + issue.voters.toString()}</p>
+                <p>{'Votes For: ' + issue.votesFor.toString()}</p>
+                <p>{'Votes Against: ' + issue.votesAgainst.toString()}</p>
+                <p>{'Votes Abstain: ' + issue.votesAbstain.toString()}</p>
+                <p>{'Quorum: ' + issue.quorum.toString()}</p>
+                <p>{'Passed: ' + issue.passed}</p>
+                <p>{'Closed: ' + issue.closed}</p>
+                <div>
+                    <button 
+                        onClick={() => handleVote(issue.id, 1)}
+                        disabled={issue.closed || voteIsPending}
+                    >
+                        {voteIsPending ? 'Voting...' : 'Vote For'}
+                    </button>
+                    <button
+                        onClick={() => handleVote(issue.id, 2)} 
+                        disabled={issue.closed || voteIsPending}
+                    >
+                        {voteIsPending ? 'Voting...' : 'Vote Against'}
+                    </button>
+                    <button
+                        onClick={() => handleVote(issue.id, 0)}
+                        disabled={issue.closed || voteIsPending}
+                    >
+                        {voteIsPending ? 'Voting...' : 'Abstain'}
+                    </button>
+                </div>
             </div>
         ));
     }
