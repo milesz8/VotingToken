@@ -3,6 +3,7 @@ import { useAccount, useReadContract, useBlockNumber, useWriteContract, useSimul
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { useQueryClient } from '@tanstack/react-query';
+import Button from '@mui/material/Button';
 
 export function TokenInfo() {
     const queryClient = useQueryClient();
@@ -47,9 +48,13 @@ export function TokenInfo() {
         <div>
           <p>{claimIsFetching.toString()}</p>
           <p>{'Token Balance: ' + tokenBalance}</p>
-          <button disabled={claimIsPending || claimIsError} onClick={handleClaimClick}>
+          <Button 
+            variant="contained"
+            disabled={claimIsPending || claimIsError}
+            onClick={handleClaimClick}
+          >
             {claimIsPending ? 'Complete In Wallet' : 'Claim Tokens'}
-          </button>
+          </Button>
           <p>{claimIsError ? 'Unable to claim tokens.' : 'Claim your tokens!'} </p>
         </div>
     );
