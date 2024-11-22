@@ -10,16 +10,20 @@ export function TokenInfo() {
     const { data: blockNumber } = useBlockNumber({ watch: true });
     const [tokenBalance, setTokenBalance] = useState(0);
 
-    const { address } = useAccount();
+    const { address, isConnected } = useAccount();
 
     const {
         data: claimData,
         isFetching: claimIsFetching,
         isError: claimIsError,
+        error: claimError,
       } = useSimulateContract({
         address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
         abi: weightedVoting.abi,
         functionName: 'claim',
+        query: {
+            enabled: isConnected,
+        }
       });
 
     const { writeContract: claim, isPending: claimIsPending } = useWriteContract();
@@ -43,6 +47,12 @@ export function TokenInfo() {
     }, [balanceIsError]);
 
     useEffect(() => {
+        if (claimError) {
+            console.error('Error claiming tokens:', claimError);
+        }
+    }, [claimError]);
+
+    useEffect(() => {
         if (balanceData) {
             setTokenBalance(Number(balanceData));
         } else {
@@ -55,8 +65,11 @@ export function TokenInfo() {
     }, [blockNumber])
 
     const handleClaimClick = () => {
-        claim(claimData!.request);
-      };
+        if (!isConnected || !claimData) {
+            return;
+        }
+        claim(claimData.request);
+    };
 
     return (
         <Paper elevation={3} sx={{ p: 3, mb: 3, width: '100%', maxWidth: 400 }}>
@@ -70,17 +83,21 @@ export function TokenInfo() {
             </Box>
             <Button 
                 variant="contained"
-                disabled={claimIsPending || claimIsError}
+                disabled={!isConnected || claimIsPending || claimIsError}
                 onClick={handleClaimClick}
                 fullWidth
             >
-                {claimIsPending ? 'Complete In Wallet' : 'Claim Tokens'}
+                {!isConnected ? 'Connect Wallet' : 
+                 claimIsPending ? 'Complete In Wallet' : 
+                 'Claim Tokens'}
             </Button>
             <Typography 
                 color={claimIsError ? "error" : "info"} 
                 sx={{ mt: 2 }}
             >
-                {claimIsError ? 'Unable to claim tokens.' : 'Claim your tokens!'}
+                {!isConnected ? 'Please connect your wallet first.' :
+                 claimIsError ? 'Unable to claim tokens.' : 
+                 'Claim your tokens!'}
             </Typography>
         </Paper>
     );
