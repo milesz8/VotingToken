@@ -9,6 +9,7 @@ export function TokenInfo() {
     const queryClient = useQueryClient();
     const { data: blockNumber } = useBlockNumber({ watch: true });
     const [tokenBalance, setTokenBalance] = useState(0);
+    const [isTokensClaimed, setIsTokensClaimed] = useState(false);
 
     const { address, isConnected } = useAccount();
 
@@ -48,7 +49,15 @@ export function TokenInfo() {
 
     useEffect(() => {
         if (claimError) {
-            console.error('Error claiming tokens:', claimError);
+            const isClaimed = claimError?.message?.includes('TokensClaimed');
+            setIsTokensClaimed(isClaimed);
+            if (isClaimed) {
+                console.log('Tokens already claimed');
+            } else {
+                console.error('Error claiming tokens:', claimError);
+            }
+        } else {
+            setIsTokensClaimed(false);
         }
     }, [claimError]);
 
@@ -83,20 +92,25 @@ export function TokenInfo() {
             </Box>
             <Button 
                 variant="contained"
-                disabled={!isConnected || claimIsPending || claimIsError}
+                disabled={!isConnected || isTokensClaimed || claimIsPending || (claimIsError && !isTokensClaimed)}
                 onClick={handleClaimClick}
                 fullWidth
             >
                 {!isConnected ? 'Connect Wallet' : 
                  claimIsPending ? 'Complete In Wallet' : 
+                 isTokensClaimed ? 'Already Claimed' :
                  'Claim Tokens'}
             </Button>
             <Typography 
-                color={claimIsError ? "error" : "info"} 
+                color={claimIsError && !isTokensClaimed ? "error" : "info"} 
                 sx={{ mt: 2 }}
             >
                 {!isConnected ? 'Please connect your wallet first.' :
-                 claimIsError ? 'Unable to claim tokens.' : 
+                 claimIsError ? (
+                    isTokensClaimed ? 
+                    'You have already claimed your tokens.' : 
+                    'Unable to claim tokens.'
+                 ) : 
                  'Claim your tokens!'}
             </Typography>
         </Paper>
