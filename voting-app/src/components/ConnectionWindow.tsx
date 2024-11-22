@@ -1,4 +1,6 @@
 import { useAccount } from 'wagmi';
+import { Paper, Typography, Box } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 
 export function ConnectionWindow() {
   const { address, isConnected, isConnecting, isDisconnected } = useAccount();
@@ -9,26 +11,35 @@ export function ConnectionWindow() {
   };
 
   return (
-    <div className="connection-window">
-      <h2>Wallet Connection</h2>
-      <div className="connection-status">
+    <Paper elevation={3} sx={{ p: 3, mb: 3, width: '100%', maxWidth: 400 }}>
+      <Typography variant="h6" gutterBottom>
+        Wallet Connection
+      </Typography>
+      <Box sx={{ mt: 2 }}>
         {isConnecting && (
-          <p className="connecting">
-            Connecting wallet...
-          </p>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CircularProgress size={20} />
+            <Typography>
+              Connecting wallet...
+            </Typography>
+          </Box>
         )}
         {isConnected && (
-          <div>
-            <p className="connected">Connected</p>
-            <p className="address">Address: {formatAddress(address)}</p>
-          </div>
+          <Box>
+            <Typography color="success.main" gutterBottom>
+              Connected
+            </Typography>
+            <Typography variant="body2">
+              Address: {formatAddress(address)}
+            </Typography>
+          </Box>
         )}
         {isDisconnected && (
-          <p className="disconnected">
+          <Typography color="error.main">
             Please connect your wallet to access the voting system
-          </p>
+          </Typography>
         )}
-      </div>
-    </div>
+      </Box>
+    </Paper>
   );
 }

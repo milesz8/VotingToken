@@ -1,8 +1,19 @@
 import { useReadContract, useWriteContract, useBlockNumber } from 'wagmi';
-import React, { useState, useEffect, } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import { 
+  Paper, 
+  Typography, 
+  Button, 
+  Card, 
+  CardContent, 
+  CardActions,
+  Grid2,
+  ButtonGroup,
+  Box
+} from '@mui/material';
 
 enum Vote {
     FOR = 0,
@@ -73,52 +84,56 @@ export function IssueList() {
     };
 
     function renderIssues() {
-
         return issues.map((issue) => (
-            <div key={issue.issueDesc}>
-                <h3>{issue.issueDesc}</h3>
-                <p>{'ID: ' + issue.id.toString()}</p>
-                <p>{'Voters: ' + issue.voters.toString()}</p>
-                <p>{'Votes For: ' + issue.votesFor.toString()}</p>
-                <p>{'Votes Against: ' + issue.votesAgainst.toString()}</p>
-                <p>{'Votes Abstain: ' + issue.votesAbstain.toString()}</p>
-                <p>{'Quorum: ' + issue.quorum.toString()}</p>
-                <p>{'Passed: ' + issue.passed}</p>
-                <p>{'Closed: ' + issue.closed}</p>
-                <div>
-                    <button 
-                        onClick={() => handleVote(issue.id, Vote.FOR)}
-                        disabled={issue.closed || voteIsPending}
-                    >
-                        {voteIsPending ? 'Voting...' : 'Vote For'}
-                    </button>
-                    <button
-                        onClick={() => handleVote(issue.id, Vote.AGAINST)} 
-                        disabled={issue.closed || voteIsPending}
-                    >
-                        {voteIsPending ? 'Voting...' : 'Vote Against'}
-                    </button>
-                    <button
-                        onClick={() => handleVote(issue.id, Vote.ABSTAIN)}
-                        disabled={issue.closed || voteIsPending}
-                    >
-                        {voteIsPending ? 'Voting...' : 'Abstain'}
-                    </button>
-                </div>
-            </div>
+            <Grid2 size={4} key={issue.issueDesc}>
+                <Card>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>
+                            {issue.issueDesc}
+                        </Typography>
+                        <Typography variant="body2">ID: {issue.id.toString()}</Typography>
+                        <Typography variant="body2">Voters: {issue.voters.toString()}</Typography>
+                        <Typography variant="body2">Votes For: {issue.votesFor.toString()}</Typography>
+                        <Typography variant="body2">Votes Against: {issue.votesAgainst.toString()}</Typography>
+                        <Typography variant="body2">Votes Abstain: {issue.votesAbstain.toString()}</Typography>
+                        <Typography variant="body2">Required votes: {issue.quorum.toString()}</Typography>
+                        <Typography variant="body2">Passed: {issue.passed.toString()}</Typography>
+                    </CardContent>
+                    <CardActions>
+                        <ButtonGroup variant="contained" disabled={issue.closed || voteIsPending}>
+                            <Button 
+                                onClick={() => handleVote(issue.id, Vote.FOR)}
+                                color="success"
+                            >
+                                {voteIsPending ? 'Voting...' : 'Vote For'}
+                            </Button>
+                            <Button
+                                onClick={() => handleVote(issue.id, Vote.AGAINST)}
+                                color="error"
+                            >
+                                {voteIsPending ? 'Voting...' : 'Vote Against'}
+                            </Button>
+                            <Button
+                                onClick={() => handleVote(issue.id, Vote.ABSTAIN)}
+                                color="info"
+                            >
+                                {voteIsPending ? 'Voting...' : 'Abstain'}
+                            </Button>
+                        </ButtonGroup>
+                    </CardActions>
+                </Card>
+            </Grid2>
         ));
     }
 
     return (
-        <div>
-          <button disabled={issuesIsLoading} onClick={handleTriggerRead}>
-            {issuesIsLoading ? 'Loading' : 'Read Now'}
-          </button>
-          <h2>Number of times called</h2>
-          <p>{timesCalled.toString()}</p>
-          <p>{'Has focus: ' + pageIsFocused}</p>
-          <h2>All Issues</h2>
-          <div>{renderIssues()}</div>
-        </div>
-      );
+        <Paper elevation={0} sx={{ p: 3, width: '100%' }}>
+            <Typography variant="h6" gutterBottom>
+                All Issues
+            </Typography>
+            <Grid2 container spacing={3}>
+                {renderIssues()}
+            </Grid2>
+        </Paper>
+    );
 }
