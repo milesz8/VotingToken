@@ -14,7 +14,7 @@ export const configReown = getDefaultConfig({
   pollingInterval: 30_000,
 });
 
-const configQuickNode = createConfig({
+export const configQuickNode = createConfig({
   chains: (process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [baseSepolia] : [base]),
   ssr: true,
   transports: {

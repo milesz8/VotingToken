@@ -9,7 +9,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { theme } from '../theme/theme';
 
-import { configReown } from '../wagmi';
+import { configReown, configQuickNode } from '../wagmi';
 
 const client = new QueryClient();
 
@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <WagmiProvider config={configReown}>
+      <WagmiProvider config={configQuickNode}>
         <QueryClientProvider client={client}>
           <RainbowKitProvider>
             <Component {...pageProps} />

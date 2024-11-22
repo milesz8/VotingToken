@@ -23,23 +23,17 @@ enum Vote {
 
 export function IssueList() {
     const queryClient = useQueryClient();
-
-
-    const [timesCalled, setTimesCalled] = useState(0);
-    const [pageIsFocused, setPageIsFocused] = useState(true);
     const [issues, setIssues] = useState<Issue[]>([]);
     const [triggerRead, setTriggerRead] = useState(false);
-
-    const handleTriggerRead = () => {
-      setTriggerRead(true);
-    };
 
     const { data: blockNumber } = useBlockNumber({ watch: triggerRead });
 
     useEffect(() => {
-        setTriggerRead(false);
-        queryClient.invalidateQueries({ queryKey: issuesQueryKey });
-    }, [blockNumber, queryClient]);
+        if (triggerRead) {
+            setTriggerRead(false);
+            queryClient.invalidateQueries({ queryKey: issuesQueryKey });
+        }
+    }, [blockNumber, queryClient, triggerRead]);
 
     const {
         data: issuesData,
@@ -61,16 +55,6 @@ export function IssueList() {
           setIssues(issuesList);
         }
       }, [issuesData]);
-
-    useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: issuesQueryKey });
-      }, [blockNumber, queryClient, issuesQueryKey]);
-
-
-    useEffect(() => {
-        setTimesCalled((prev) => prev + 1);
-        queryClient.invalidateQueries({ queryKey: issuesQueryKey });
-      }, [blockNumber, queryClient]);
 
     const { writeContract: vote, isPending: voteIsPending } = useWriteContract();
 
