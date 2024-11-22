@@ -1,13 +1,19 @@
 import { useWriteContract } from 'wagmi';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TextField, Button, Box, Paper } from '@mui/material';
 
 export function CreateIssue() {
-    const { writeContract: createIssue, isPending: createIssueIsPending } = useWriteContract();
+    const { error: createIssueIsError, writeContract: createIssue, isPending: createIssueIsPending } = useWriteContract();
     const [issueDesc, setIssueDesc] = useState('');
     const [quorum, setQuorum] = useState('');
+
+    useEffect(() => {
+        if (createIssueIsError) {
+            console.error('Error creating issue:', createIssueIsError);
+        }
+    }, [createIssueIsError]);
 
     const handleCreateIssueClick = () => {
         if (!issueDesc || !quorum) return;

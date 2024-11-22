@@ -10,6 +10,8 @@ export function TokenInfo() {
     const { data: blockNumber } = useBlockNumber({ watch: true });
     const [tokenBalance, setTokenBalance] = useState(0);
 
+    const { address } = useAccount();
+
     const {
         data: claimData,
         isFetching: claimIsFetching,
@@ -22,17 +24,29 @@ export function TokenInfo() {
 
     const { writeContract: claim, isPending: claimIsPending } = useWriteContract();
 
-    const { data: balanceData, queryKey: balanceQueryKey } = 
+    const { error: balanceIsError, data: balanceData, queryKey: balanceQueryKey } = 
         useReadContract({ 
             address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
             abi: weightedVoting.abi,
             functionName: "balanceOf",
-            args: [useAccount().address]
+            args: address ? [address] : undefined,
+            query: {
+                enabled: !!address,
+            }
         });
 
     useEffect(() => {
+        if (balanceIsError) {
+            console.error('Error getting balance:', balanceIsError);
+            setTokenBalance(0);
+        }
+    }, [balanceIsError]);
+
+    useEffect(() => {
         if (balanceData) {
-            setTokenBalance(balanceData as number);
+            setTokenBalance(Number(balanceData));
+        } else {
+            setTokenBalance(0);
         }
     }, [balanceData])
 
