@@ -127,7 +127,7 @@ export function IssueList() {
     }
 
     return (
-        <Paper elevation={0} sx={{ p: 3, width: '100%' }}>
+        <Paper elevation={0} sx={{ p: 3, width: '80%' }}>
             <Typography variant="h6" gutterBottom>
                 All Issues
             </Typography>
