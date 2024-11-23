@@ -11,9 +11,9 @@ import {
   CardContent, 
   CardActions,
   Grid2,
-  ButtonGroup,
-  Box
+  ButtonGroup
 } from '@mui/material';
+import { Issue } from '../Models/Issue';
 
 enum Vote {
     FOR = 0,
@@ -28,25 +28,21 @@ export function IssueList() {
 
     const { data: blockNumber } = useBlockNumber({ watch: triggerRead });
 
+    const {
+        data: issuesData,
+        queryKey: issuesQueryKey,
+    } = useReadContract({
+        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+        abi: weightedVoting.abi,
+        functionName: 'getAllIssues',
+    });
+
     useEffect(() => {
         if (triggerRead) {
             setTriggerRead(false);
             queryClient.invalidateQueries({ queryKey: issuesQueryKey });
         }
-    }, [blockNumber, queryClient, triggerRead]);
-
-    const {
-        data: issuesData,
-        isError: issuesIsError,
-        isPending: issuesIsPending,
-        isLoading: issuesIsLoading,
-        isFetching: issuesIsFetching,
-        queryKey: issuesQueryKey,
-      } = useReadContract({
-        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
-        abi: weightedVoting.abi,
-        functionName: 'getAllIssues',
-      });
+    }, [blockNumber, queryClient, triggerRead, issuesQueryKey]);
 
     useEffect(() => {
         if (issuesData) {

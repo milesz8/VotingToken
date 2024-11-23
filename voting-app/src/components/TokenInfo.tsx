@@ -15,7 +15,6 @@ export function TokenInfo() {
 
     const {
         data: claimData,
-        isFetching: claimIsFetching,
         isError: claimIsError,
         error: claimError,
       } = useSimulateContract({
@@ -71,7 +70,7 @@ export function TokenInfo() {
 
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: balanceQueryKey});
-    }, [blockNumber])
+    }, [blockNumber, balanceQueryKey, queryClient])
 
     const handleClaimClick = () => {
         if (!isConnected || !claimData) {

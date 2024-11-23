@@ -1,4 +1,4 @@
-interface Issue {
+export interface Issue {
     id: number;
     voters: string[];
     issueDesc: string;
