@@ -1,36 +1,23 @@
 // index.tsx
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import type { NextPage } from 'next';
-import styles from '../styles/Home.module.css';
+import { Typography, Paper, Grid } from '@mui/material';
 import { ConnectionWindow } from '../components/ConnectionWindow';
-import { IssueList } from '../components/IssueList';
-import { TokenInfo } from '../components/TokenInfo';
-import { CreateIssue } from '../components/CreateIssue';
-import { Grid2, Stack } from '@mui/material';
 
-const Home: NextPage = () => {
+export default function Home() {
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <Grid2 container spacing={6} sx={{ width: '100%' }}>
-            <Grid2 size={2}>
-              <Stack direction="column" spacing={2}>
-                <ConnectButton />
-                <ConnectionWindow />
-              </Stack>
-            </Grid2>
-            <Grid2 size={2}>
-                <TokenInfo />
-            </Grid2>
-            <Grid2 size={2}>
-                <CreateIssue />
-            </Grid2>
-        </Grid2>
-
-        <IssueList />
-      </main>
-    </div>
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h4" gutterBottom>
+            Welcome to the Voting dApp
+          </Typography>
+          <Typography variant="body1">
+            Connect your wallet to participate in decentralized voting
+          </Typography>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <ConnectionWindow />
+      </Grid>
+    </Grid>
   );
-};
-
-export default Home;
+}

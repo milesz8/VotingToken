@@ -8,6 +8,7 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { theme } from '../theme/theme';
+import { Layout } from '../components/Layout';
 
 import { configReown } from '../wagmi';
 
@@ -20,7 +21,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <WagmiProvider config={configReown}>
         <QueryClientProvider client={client}>
           <RainbowKitProvider>
-            <Component {...pageProps} />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
