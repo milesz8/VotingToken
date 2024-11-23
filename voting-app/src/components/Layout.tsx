@@ -1,11 +1,8 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { AppBar, Toolbar, Container, Box, Typography, Button } from '@mui/material';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-
   return (
     <>
       <AppBar position="static">
