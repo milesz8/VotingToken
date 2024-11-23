@@ -1,19 +1,31 @@
-import { useWriteContract } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { useState, useEffect } from 'react';
 import { TextField, Button, Box, Paper } from '@mui/material';
 
 export function CreateIssue() {
-    const { error: createIssueIsError, writeContract: createIssue, isPending: createIssueIsPending } = useWriteContract();
+    const { error: createIssueIsError, writeContract: createIssue, isPending: createIssueIsPending, data: createIssueHash } = useWriteContract();
     const [issueDesc, setIssueDesc] = useState('');
     const [quorum, setQuorum] = useState('');
+
+    const { isSuccess: createIssueSuccess } = useWaitForTransactionReceipt({
+        hash: createIssueHash,
+    });
 
     useEffect(() => {
         if (createIssueIsError) {
             console.error('Error creating issue:', createIssueIsError);
         }
     }, [createIssueIsError]);
+
+    useEffect(() => {
+        if (createIssueSuccess) {
+            setIssueDesc('');
+            setQuorum('');
+            window.dispatchEvent(new Event('issueCreated'));
+        }
+    }, [createIssueSuccess]);
 
     const handleCreateIssueClick = () => {
         if (!issueDesc || !quorum) return;

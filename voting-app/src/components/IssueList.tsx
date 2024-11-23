@@ -1,4 +1,4 @@
-import { useReadContract, useWriteContract, useBlockNumber } from 'wagmi';
+import { useReadContract, useWriteContract, useBlockNumber, useWaitForTransactionReceipt } from 'wagmi';
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
@@ -52,7 +52,17 @@ export function IssueList() {
         }
       }, [issuesData]);
 
-    const { writeContract: vote, isPending: voteIsPending } = useWriteContract();
+    const { writeContract: vote, isPending: voteIsPending, data: voteHash } = useWriteContract();
+
+    const { isSuccess: voteSuccess } = useWaitForTransactionReceipt({
+        hash: voteHash,
+    });
+
+    useEffect(() => {
+        if (voteSuccess) {
+            setTriggerRead(true);
+        }
+    }, [voteSuccess]);
 
     const handleVote = (issueId: number, voteType: Vote) => {
         vote({
@@ -62,6 +72,15 @@ export function IssueList() {
             args: [BigInt(issueId), BigInt(voteType)],
         });
     };
+
+    useEffect(() => {
+        const handleIssueCreated = () => {
+            setTriggerRead(true);
+        };
+        
+        window.addEventListener('issueCreated', handleIssueCreated);
+        return () => window.removeEventListener('issueCreated', handleIssueCreated);
+    }, []);
 
     function renderIssues() {
         return issues.map((issue) => (
