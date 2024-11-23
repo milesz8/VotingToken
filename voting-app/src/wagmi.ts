@@ -6,6 +6,9 @@ import {
 
 import { createConfig, http } from 'wagmi'
 
+const QUICKNODE_BASE_SEPOLIA_URL = process.env.NEXT_PUBLIC_QUICKNODE_BASE_SEPOLIA_URL;
+const QUICKNODE_BASE_URL = process.env.NEXT_PUBLIC_QUICKNODE_BASE_URL;
+
 export const configReown = getDefaultConfig({
   appName: 'RainbowKit App',
   projectId: '6e721d47365cbcbcbac5e8f4e455d54a',
@@ -18,8 +21,8 @@ export const configQuickNode = createConfig({
   chains: (process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [baseSepolia] : [base]),
   ssr: true,
   transports: {
-    [baseSepolia.id]: http('https://quiet-crimson-friday.base-sepolia.quiknode.pro/c04fb0df701339421b04c4cc59785ddba5b284ee'),
-    [base.id]: http('TODO'),
+    [baseSepolia.id]: http(QUICKNODE_BASE_SEPOLIA_URL),
+    [base.id]: http(QUICKNODE_BASE_URL),
   },
   pollingInterval: 30_000,
 });
