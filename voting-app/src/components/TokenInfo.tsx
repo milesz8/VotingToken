@@ -16,7 +16,6 @@ export function TokenInfo() {
     const {
         data: claimData,
         isError: claimIsError,
-        error: claimError,
       } = useSimulateContract({
         address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
         abi: weightedVoting.abi,
@@ -39,6 +38,16 @@ export function TokenInfo() {
             }
         });
 
+    const { data: hasClaimedData } = useReadContract({
+        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+        abi: weightedVoting.abi,
+        functionName: "hasClaimed",
+        args: address ? [address] : undefined,
+        query: {
+            enabled: !!address,
+        }
+    });
+
     useEffect(() => {
         if (balanceIsError) {
             console.error('Error getting balance:', balanceIsError);
@@ -47,18 +56,8 @@ export function TokenInfo() {
     }, [balanceIsError]);
 
     useEffect(() => {
-        if (claimError) {
-            const isClaimed = claimError?.message?.includes('TokensClaimed');
-            setIsTokensClaimed(isClaimed);
-            if (isClaimed) {
-                console.log('Tokens already claimed');
-            } else {
-                console.error('Error claiming tokens:', claimError);
-            }
-        } else {
-            setIsTokensClaimed(false);
-        }
-    }, [claimError]);
+        setIsTokensClaimed(!!hasClaimedData);
+    }, [hasClaimedData]);
 
     useEffect(() => {
         if (balanceData) {
@@ -105,11 +104,7 @@ export function TokenInfo() {
                 sx={{ mt: 2 }}
             >
                 {!isConnected ? 'Please connect your wallet first.' :
-                 claimIsError ? (
-                    isTokensClaimed ? 
-                    'You have already claimed your tokens.' : 
-                    'Unable to claim tokens.'
-                 ) : 
+                 isTokensClaimed ? 'Thanks for claiming your tokens!' :
                  'Claim your tokens!'}
             </Typography>
         </Paper>

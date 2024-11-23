@@ -59,11 +59,18 @@ contract WeightedVoting is ERC20 {
         if (totalSupply() >= maxSupply) {
             revert AllTokensClaimed();
         }
-        if (balanceOf(msg.sender) > 0) {
+        if (_claimed[msg.sender]) {
             revert TokensClaimed();
         }
         ERC20._mint(msg.sender, 100);
         totalClaimed += 100;
+        _claimed[msg.sender] = true;
+    }
+
+    mapping(address => bool) public _claimed;
+
+    function hasClaimed(address user) public view returns (bool) {
+        return _claimed[user];
     }
 
     function createIssue(string memory issueDesc, uint256 quorum) external returns (uint) {
