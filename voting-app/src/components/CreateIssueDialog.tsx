@@ -93,9 +93,9 @@ export function CreateIssueDialog() {
         </DialogTitle>
         <DialogContent>
           {!isConnected ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 2 }}>
               <p>You need to connect your wallet first.</p>
-              <ConnectButton /> 
+              <ConnectButton />
             </Box>
           ) : !isTokensClaimed ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
