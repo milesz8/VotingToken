@@ -11,6 +11,7 @@ import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadCont
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import AddIcon from '@mui/icons-material/Add';
+import { ClaimButton } from './ClaimButton';
 
 export function CreateIssueDialog() {
   const [open, setOpen] = useState(false);
@@ -78,31 +79,40 @@ export function CreateIssueDialog() {
           onSubmit: handleSubmit,
         }}
       >
-        <DialogTitle>Create Issue</DialogTitle>
+        <DialogTitle>{isTokensClaimed ? 'Create Issue' : 'Claim Tokens First'}</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-            <TextField
-              fullWidth
-              label="Issue Description"
-              variant="outlined"
-              value={issueDesc}
-              onChange={(e) => setIssueDesc(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              type="number"
-              label="Quorum"
-              variant="outlined"
-              value={quorum}
-              onChange={(e) => setQuorum(e.target.value)}
-            />
-          </Box>
+          {isTokensClaimed ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+              <TextField
+                fullWidth
+                label="Issue Description"
+                variant="outlined"
+                value={issueDesc}
+                onChange={(e) => setIssueDesc(e.target.value)}
+              />
+              <TextField
+                fullWidth
+                type="number"
+                label="Quorum"
+                variant="outlined"
+                value={quorum}
+                onChange={(e) => setQuorum(e.target.value)}
+              />
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+              <p>You need to claim tokens before you can create an issue.</p>
+              <ClaimButton />
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type="submit" disabled={createIssueIsPending}>
-            {createIssueIsPending ? 'Creating...' : 'Create'}
-          </Button>
+          {isTokensClaimed && (
+            <Button type="submit" disabled={createIssueIsPending}>
+              {createIssueIsPending ? 'Creating...' : 'Create'}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </React.Fragment>
