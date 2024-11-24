@@ -9,10 +9,10 @@ import {
   Button,
   Grid2,
   ButtonGroup,
-  Stack
+  Box,
 } from '@mui/material';
 import { Issue } from '../Models/Issue';
-
+import { CreateIssueDialog } from './CreateIssueDialog';
 enum Vote {
     FOR = 0,
     AGAINST = 1,
@@ -120,9 +120,12 @@ export function IssueList() {
 
     return (
         <Paper elevation={0} sx={{ p: 3, width: '100%' }}>
-            <Typography variant="h6" gutterBottom>
-                All Issues
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">
+                    All Issues
+                </Typography>
+                <CreateIssueDialog />
+            </Box>
             <Grid2 container>
                 {renderIssues()}
             </Grid2>

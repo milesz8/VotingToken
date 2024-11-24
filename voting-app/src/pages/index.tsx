@@ -9,7 +9,6 @@ export default function Home() {
       <Typography variant="h4" gutterBottom>
         Voting Issues
       </Typography>
-      <CreateIssue />
       <IssueList />
     </>
   );
