@@ -1,6 +1,5 @@
 // index.tsx
-import { Typography, Paper, Grid } from '@mui/material';
-import { CreateIssue } from '../components/CreateIssue';
+import { Typography } from '@mui/material';
 import { IssueList } from '../components/IssueList';
 
 export default function Home() {

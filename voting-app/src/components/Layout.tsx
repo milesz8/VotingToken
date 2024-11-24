@@ -1,5 +1,5 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { AppBar, Toolbar, Container, Box, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Container, Box, Typography } from '@mui/material';
 import Link from 'next/link';
 import { TokenBalance } from './TokenBalance';
 

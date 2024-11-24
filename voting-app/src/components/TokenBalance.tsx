@@ -3,7 +3,7 @@ import { useAccount, useReadContract, useBlockNumber } from 'wagmi';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { useQueryClient } from '@tanstack/react-query';
-import { Paper, Typography, Box } from '@mui/material';
+import { Typography } from '@mui/material';
 
 export function TokenBalance() {
     const queryClient = useQueryClient();
