@@ -7,19 +7,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Voting dApp
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Link href="/" passHref>
-              <Button color="inherit">Home</Button>
-            </Link>
-            <Link href="/issues" passHref>
-              <Button color="inherit">Issues</Button>
-            </Link>
-            <Link href="/claim" passHref>
-              <Button color="inherit">Claim</Button>
-            </Link>
+          <Link href="/" passHref>
+            <Typography variant="h6" component="div" sx={{ cursor: 'pointer' }}>
+              Voting dApp
+            </Typography>
+          </Link>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginLeft: 'auto' }}>
             <ConnectButton />
           </Box>
         </Toolbar>
