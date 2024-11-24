@@ -7,7 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Box, Fab } from '@mui/material';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import AddIcon from '@mui/icons-material/Add';
@@ -49,6 +49,21 @@ export function CreateIssueDialog() {
       args: [issueDesc, BigInt(quorum)],
     });
   };
+
+  const { address, isConnected } = useAccount();
+  const [isTokensClaimed, setIsTokensClaimed] = useState(false);
+  const { data: hasClaimedData } = useReadContract({
+        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+        abi: weightedVoting.abi,
+        functionName: "hasClaimed",
+        args: isConnected ? [address] : undefined,
+        query: {
+            enabled: !!isConnected,
+        }
+    });
+    useEffect(() => {
+        setIsTokensClaimed(!!hasClaimedData);
+    }, [hasClaimedData]);
 
   return (
     <React.Fragment>
