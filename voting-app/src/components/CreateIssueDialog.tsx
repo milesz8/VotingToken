@@ -14,7 +14,7 @@ interface IssueFormData {
 }
 
 function useIssueCreation() {
-  const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '' });
+  const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '100' });
   const [open, setOpen] = useState(false);
 
   const { error, writeContract, isPending, data: hash } = useWriteContract();
@@ -77,6 +77,8 @@ export function CreateIssueDialog() {
         <AddIcon />
       </Fab>
       <Dialog
+        fullWidth
+        maxWidth="md"
         open={open}
         onClose={() => setOpen(false)}
         PaperProps={{
