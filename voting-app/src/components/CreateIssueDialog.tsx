@@ -1,70 +1,75 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { Box, Fab } from '@mui/material';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Box, Fab, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
-import AddIcon from '@mui/icons-material/Add';
 import { ClaimButton } from './ClaimButton';
 
-export function CreateIssueDialog() {
+interface IssueFormData {
+  issueDesc: string;
+  quorum: string;
+}
+
+function useIssueCreation() {
+  const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '' });
   const [open, setOpen] = useState(false);
-  const [issueDesc, setIssueDesc] = useState('');
-  const [quorum, setQuorum] = useState('');
 
-  const { error: createIssueIsError, writeContract: createIssue, isPending: createIssueIsPending, data: createIssueHash } = useWriteContract();
-
-  const { isSuccess: createIssueSuccess } = useWaitForTransactionReceipt({
-    hash: createIssueHash,
-  });
+  const { error, writeContract, isPending, data: hash } = useWriteContract();
+  const { isSuccess } = useWaitForTransactionReceipt({ hash });
 
   useEffect(() => {
-    if (createIssueIsError) {
-      console.error('Error creating issue:', createIssueIsError);
-    }
-  }, [createIssueIsError]);
+    if (error) console.error('Error creating issue:', error);
+  }, [error]);
 
   useEffect(() => {
-    if (createIssueSuccess) {
-      setIssueDesc('');
-      setQuorum('');
+    if (isSuccess) {
+      setFormData({ issueDesc: '', quorum: '' });
       setOpen(false);
       window.dispatchEvent(new Event('issueCreated'));
     }
-  }, [createIssueSuccess]);
+  }, [isSuccess]);
+
+  return {
+    formData,
+    setFormData,
+    open,
+    setOpen,
+    writeContract,
+    isPending,
+  };
+}
+
+export function CreateIssueDialog() {
+  const { formData, setFormData, open, setOpen, writeContract, isPending } = useIssueCreation();
+  const { address, isConnected } = useAccount();
+  const [isTokensClaimed, setIsTokensClaimed] = useState(false);
+
+  const { data: hasClaimedData } = useReadContract({
+    address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+    abi: weightedVoting.abi,
+    functionName: "hasClaimed",
+    args: isConnected ? [address] : undefined,
+    query: { enabled: !!isConnected }
+  });
+
+  useEffect(() => {
+    setIsTokensClaimed(!!hasClaimedData);
+  }, [hasClaimedData]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!issueDesc || !quorum) return;
+    if (!formData.issueDesc || !formData.quorum) return;
 
-    createIssue({
+    writeContract({
       address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
       abi: weightedVoting.abi,
       functionName: "createIssue",
-      args: [issueDesc, BigInt(quorum)],
+      args: [formData.issueDesc, BigInt(formData.quorum)],
     });
   };
-
-  const { address, isConnected } = useAccount();
-  const [isTokensClaimed, setIsTokensClaimed] = useState(false);
-  const { data: hasClaimedData } = useReadContract({
-        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
-        abi: weightedVoting.abi,
-        functionName: "hasClaimed",
-        args: isConnected ? [address] : undefined,
-        query: {
-            enabled: !!isConnected,
-        }
-    });
-    useEffect(() => {
-        setIsTokensClaimed(!!hasClaimedData);
-    }, [hasClaimedData]);
 
   return (
     <React.Fragment>
@@ -79,38 +84,49 @@ export function CreateIssueDialog() {
           onSubmit: handleSubmit,
         }}
       >
-        <DialogTitle>{isTokensClaimed ? 'Create Issue' : 'Claim Tokens First'}</DialogTitle>
+        <DialogTitle>
+          {!isConnected 
+            ? 'Connect Wallet First' 
+            : !isTokensClaimed 
+              ? 'Claim Tokens First' 
+              : 'Create Issue'}
+        </DialogTitle>
         <DialogContent>
-          {isTokensClaimed ? (
+          {!isConnected ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+              <p>You need to connect your wallet first.</p>
+              <ConnectButton /> 
+            </Box>
+          ) : !isTokensClaimed ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+              <p>You need to claim tokens first.</p>
+              <ClaimButton />
+            </Box>
+          ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
               <TextField
                 fullWidth
                 label="Issue Description"
                 variant="outlined"
-                value={issueDesc}
-                onChange={(e) => setIssueDesc(e.target.value)}
+                value={formData.issueDesc}
+                onChange={(e) => setFormData({ ...formData, issueDesc: e.target.value })}
               />
               <TextField
                 fullWidth
                 type="number"
                 label="Quorum"
                 variant="outlined"
-                value={quorum}
-                onChange={(e) => setQuorum(e.target.value)}
+                value={formData.quorum}
+                onChange={(e) => setFormData({ ...formData, quorum: e.target.value })}
               />
-            </Box>
-          ) : (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-              <p>You need to claim tokens before you can create an issue.</p>
-              <ClaimButton />
             </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          {isTokensClaimed && (
-            <Button type="submit" disabled={createIssueIsPending}>
-              {createIssueIsPending ? 'Creating...' : 'Create'}
+          {isConnected && isTokensClaimed && (
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating...' : 'Create'}
             </Button>
           )}
         </DialogActions>
