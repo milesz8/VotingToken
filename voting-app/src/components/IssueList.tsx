@@ -1,8 +1,6 @@
-import { useReadContract, useWriteContract, useBlockNumber, useWaitForTransactionReceipt } from 'wagmi';
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
-import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import { useReadContract, useWriteContract, useBlockNumber, useWaitForTransactionReceipt } from 'wagmi';
 import {
   Paper,
   Typography,
@@ -11,18 +9,19 @@ import {
   ButtonGroup,
   Box,
 } from '@mui/material';
+
+import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { Issue } from '../Models/Issue';
+import { Vote } from '../Models/Vote';
 import { CreateIssueDialog } from './CreateIssueDialog';
-enum Vote {
-    FOR = 0,
-    AGAINST = 1,
-    ABSTAIN = 2
-}
+import IssueDetails from './IssueDetails';
 
 export function IssueList() {
     const queryClient = useQueryClient();
-    const [issues, setIssues] = useState<Issue[]>([]);
     const [triggerRead, setTriggerRead] = useState(false);
+    const [issues, setIssues] = useState<Issue[]>([]);
+    const [selectedIssue, setSelectedIssue] = useState<number | null>(null);
 
     const { data: blockNumber } = useBlockNumber({ watch: triggerRead });
 
@@ -35,6 +34,16 @@ export function IssueList() {
         functionName: 'getAllIssues',
     });
 
+    const { 
+        writeContract: vote, 
+        isPending: voteIsPending, 
+        data: voteHash 
+    } = useWriteContract();
+
+    const { isSuccess: voteSuccess } = useWaitForTransactionReceipt({
+        hash: voteHash,
+    });
+
     useEffect(() => {
         if (triggerRead) {
             setTriggerRead(false);
@@ -44,23 +53,27 @@ export function IssueList() {
 
     useEffect(() => {
         if (issuesData) {
-          const issuesList = issuesData as Issue[];
-          console.log('issuesList', issuesList);
-          setIssues(issuesList);
+            setIssues(issuesData as Issue[]);
         }
-      }, [issuesData]);
-
-    const { writeContract: vote, isPending: voteIsPending, data: voteHash } = useWriteContract();
-
-    const { isSuccess: voteSuccess } = useWaitForTransactionReceipt({
-        hash: voteHash,
-    });
+    }, [issuesData]);
 
     useEffect(() => {
         if (voteSuccess) {
             setTriggerRead(true);
         }
     }, [voteSuccess]);
+
+    useEffect(() => {
+        const handleIssueCreated = () => setTriggerRead(true);
+        window.addEventListener('issueCreated', handleIssueCreated);
+        return () => window.removeEventListener('issueCreated', handleIssueCreated);
+    }, []);
+
+    useEffect(() => {
+        if (issues.length > 0 && selectedIssue === null) {
+            setSelectedIssue(issues[0].id);
+        }
+    }, [issues, selectedIssue]);
 
     const handleVote = (issueId: number, voteType: Vote) => {
         vote({
@@ -71,19 +84,19 @@ export function IssueList() {
         });
     };
 
-    useEffect(() => {
-        const handleIssueCreated = () => {
-            setTriggerRead(true);
-        };
-
-        window.addEventListener('issueCreated', handleIssueCreated);
-        return () => window.removeEventListener('issueCreated', handleIssueCreated);
-    }, []);
-
     function renderIssues() {
         return issues.map((issue) => (
             <Grid2 size={12} key={issue.issueDesc}>
-                <Paper elevation={3} sx={{ p: 1, mb: 1 }}>
+                <Paper 
+                    elevation={3} 
+                    sx={{ 
+                        p: 1, 
+                        mb: 1,
+                        backgroundColor: selectedIssue === issue.id ? 'action.selected' : 'background.paper',
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => setSelectedIssue(issue.id)}
+                >
                     <Grid2 container>
                         <Grid2 size={6}>
                             <Typography variant="h6">
@@ -119,16 +132,20 @@ export function IssueList() {
     }
 
     return (
-        <Paper elevation={0} sx={{ p: 3, width: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">
-                    All Issues
-                </Typography>
-                <CreateIssueDialog />
-            </Box>
-            <Grid2 container>
-                {renderIssues()}
-            </Grid2>
-        </Paper>
+        <>
+            {selectedIssue !== null && issues.length > 0 && 
+                <IssueDetails issue={issues.find(issue => issue.id === selectedIssue)!} />}
+            <Paper elevation={0} sx={{ p: 3, width: '100%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">
+                        All Issues
+                    </Typography>
+                    <CreateIssueDialog />
+                </Box>
+                <Grid2 container>
+                    {renderIssues()}
+                </Grid2>
+            </Paper>
+        </>
     );
 }
