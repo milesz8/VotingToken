@@ -128,7 +128,7 @@ contract WeightedVoting is ERC20 {
             revert InvalidVote();
         }
 
-        if (issue.votesFor >= issue.quorum) {
+        if (issue.totalVotes >= issue.quorum) {
             if (issue.votesAgainst < issue.votesFor) {
                 issue.passed = true;
             }

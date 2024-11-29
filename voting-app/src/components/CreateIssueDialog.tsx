@@ -26,7 +26,7 @@ function useIssueCreation() {
 
   useEffect(() => {
     if (isSuccess) {
-      setFormData({ issueDesc: '', quorum: '' });
+      setFormData({ issueDesc: '', quorum: '100' });
       setOpen(false);
       window.dispatchEvent(new Event('issueCreated'));
     }

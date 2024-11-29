@@ -21,6 +21,19 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
         <Paper elevation={0} sx={{ mb: 3, p: 3, width: '100%' }}>
             <Typography variant="h6" gutterBottom>{issue.issueDesc}</Typography>
             <Grid2 container spacing={2}>
+                <Grid2 size={3}>
+                    <Typography variant="body1">For: {Number(issue.votesFor)}</Typography>
+                </Grid2>
+                <Grid2 size={3}>
+                    <Typography variant="body1">Against: {Number(issue.votesAgainst)}</Typography>
+                </Grid2>
+                <Grid2 size={3}>
+                    <Typography variant="body1">Abstain: {Number(issue.votesAbstain)}</Typography>
+                </Grid2>
+                <Grid2 size={3}>
+                    <Typography variant="body1">Quorum: {Number(issue.quorum)}</Typography>
+                </Grid2>
+                {issue.closed ? <Typography variant="body1">Closed</Typography> : <Typography variant="body1">Open</Typography>}
                 <Grid2 size={12} sx={{ height: 100, mt: 2 }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart 
