@@ -15,7 +15,7 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
             "Needed To Close": votesNeeded
         }
     ];
-    const COLORS = ['#4caf50', '#f44336', '#ffc107', '#9e9e9e'];
+    const COLORS = ['#4caf50', '#f44336', '#2196f3', '#9e9e9e'];
 
     return (
         <Paper elevation={0} sx={{ mb: 3, p: 3, width: '100%' }}>
