@@ -9,6 +9,7 @@ import {
   ButtonGroup,
   Box,
 } from '@mui/material';
+import { CheckCircle, Cancel } from '@mui/icons-material';
 
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
@@ -16,6 +17,19 @@ import { Issue } from '../Models/Issue';
 import { Vote } from '../Models/Vote';
 import { CreateIssueDialog } from './CreateIssueDialog';
 import IssueDetails from './IssueDetails';
+
+const StatusIndicator = ({ passed }: { passed: boolean }) => (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {passed ? (
+            <CheckCircle color="success" />
+        ) : (
+            <Cancel color="error" />
+        )}
+        <Typography variant="body1" color={passed ? "success.main" : "error.main"}>
+            {passed ? "Passed" : "Failed"}
+        </Typography>
+    </Box>
+);
 
 export function IssueList() {
     const queryClient = useQueryClient();
@@ -105,9 +119,7 @@ export function IssueList() {
                         </Grid2>
                         <Grid2 size={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             {issue.closed ? (
-                                <Typography variant="h6" color={issue.passed ? "success.main" : "error.main"}>
-                                    {issue.passed ? "Passed" : "Failed"}
-                                </Typography>
+                                <StatusIndicator passed={issue.passed} />
                             ) : (
                                 <ButtonGroup variant="contained" disabled={voteIsPending}>
                                     <Button 
