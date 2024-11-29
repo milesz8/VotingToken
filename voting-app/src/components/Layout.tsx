@@ -5,7 +5,7 @@ import { TokenBalance } from './TokenBalance';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
       <AppBar position="static">
         <Toolbar>
           <Link href="/" passHref>
@@ -19,9 +19,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Box>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Container 
+        maxWidth="lg" 
+        sx={{ 
+          mt: 4, 
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
         {children}
       </Container>
-    </>
+    </Box>
   );
 } 
