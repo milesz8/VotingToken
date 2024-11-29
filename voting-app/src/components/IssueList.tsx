@@ -8,6 +8,9 @@ import {
   Grid2,
   ButtonGroup,
   Box,
+  Select,
+  MenuItem,
+  FormControl,
 } from '@mui/material';
 import { CheckCircle, Cancel } from '@mui/icons-material';
 
@@ -36,6 +39,7 @@ export function IssueList() {
     const [triggerRead, setTriggerRead] = useState(false);
     const [issues, setIssues] = useState<Issue[]>([]);
     const [selectedIssue, setSelectedIssue] = useState<number | null>(null);
+    const [filterStatus, setFilterStatus] = useState('all');
 
     const { data: blockNumber } = useBlockNumber({ watch: triggerRead });
 
@@ -98,8 +102,19 @@ export function IssueList() {
         });
     };
 
+    const getFilteredIssues = () => {
+        switch (filterStatus) {
+            case 'open':
+                return issues.filter(issue => !issue.closed);
+            case 'closed':
+                return issues.filter(issue => issue.closed);
+            default:
+                return issues;
+        }
+    };
+
     function renderIssues() {
-        return issues.map((issue) => (
+        return getFilteredIssues().map((issue) => (
             <Grid2 size={12} key={issue.issueDesc}>
                 <Paper 
                     elevation={3} 
@@ -175,7 +190,20 @@ export function IssueList() {
                     <Typography variant="h6">
                         All Issues
                     </Typography>
-                    <CreateIssueDialog />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <FormControl size="small">
+                            <Select
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                sx={{ minWidth: 120 }}
+                            >
+                                <MenuItem value="all">All Issues</MenuItem>
+                                <MenuItem value="open">Open</MenuItem>
+                                <MenuItem value="closed">Closed</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <CreateIssueDialog />
+                    </Box>
                 </Box>
                 <Box sx={{ 
                     flexGrow: 1, 
