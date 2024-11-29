@@ -183,20 +183,6 @@ export function IssueList() {
                     display: 'flex',
                     flexDirection: 'column',
                     pr: 1,
-                    '&::-webkit-scrollbar': {
-                        width: '8px',
-                    },
-                    '&::-webkit-scrollbar-track': {
-                        background: '#f1f1f1',
-                        borderRadius: '4px',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                        background: '#888',
-                        borderRadius: '4px',
-                        '&:hover': {
-                            background: '#555',
-                        },
-                    },
                 }}>
                     <Grid2 container>
                         {renderIssues()}
