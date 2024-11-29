@@ -18,7 +18,12 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
     const COLORS = ['#4caf50', '#f44336', '#2196f3', '#9e9e9e'];
 
     return (
-        <Paper elevation={0} sx={{ mb: 3, p: 3, width: '100%' }}>
+        <Paper elevation={0} sx={{ 
+            mb: 3, 
+            p: 3, 
+            width: '100%',
+            height: '180px'
+        }}>
             <Typography variant="h6" gutterBottom>{issue.issueDesc}</Typography>
             <Grid2 container spacing={2}>
                 <Grid2 size={12} sx={{ height: 100, mt: 2 }}>

@@ -151,10 +151,11 @@ export function IssueList() {
 
     return (
         <Box sx={{ 
-            height: '80vh',
-            minHeight: '400px',
+            height: 'calc(100% - 40px)',
             display: 'flex', 
-            flexDirection: 'column' 
+            flexDirection: 'column',
+            overflow: 'hidden',
+            mb: 4
         }}>
             {selectedIssue !== null && issues.length > 0 && 
                 <IssueDetails issue={issues.find(issue => issue.id === selectedIssue)!} />}
@@ -163,10 +164,11 @@ export function IssueList() {
                 sx={{ 
                     p: 3, 
                     width: '100%', 
-                    flex: 1, 
+                    flex: 1,
                     display: 'flex', 
                     flexDirection: 'column',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    height: selectedIssue !== null ? 'calc(100% - 200px)' : '100%'
                 }}
             >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
