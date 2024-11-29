@@ -104,26 +104,32 @@ export function IssueList() {
                             </Typography>
                         </Grid2>
                         <Grid2 size={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <ButtonGroup variant="contained" disabled={issue.closed || voteIsPending}>
-                                <Button 
-                                    onClick={() => handleVote(issue.id, Vote.FOR)}
-                                    color="success"
-                                >
-                                    {voteIsPending ? 'Voting...' : 'Vote For'}
-                                </Button>
-                                <Button
-                                    onClick={() => handleVote(issue.id, Vote.AGAINST)}
-                                    color="error"
-                                >
-                                    {voteIsPending ? 'Voting...' : 'Vote Against'}
-                                </Button>
-                                <Button
-                                    onClick={() => handleVote(issue.id, Vote.ABSTAIN)}
-                                    color="info"
-                                >
-                                    {voteIsPending ? 'Voting...' : 'Abstain'}
-                                </Button>
-                            </ButtonGroup>
+                            {issue.closed ? (
+                                <Typography variant="h6" color={issue.passed ? "success.main" : "error.main"}>
+                                    {issue.passed ? "Passed" : "Failed"}
+                                </Typography>
+                            ) : (
+                                <ButtonGroup variant="contained" disabled={voteIsPending}>
+                                    <Button 
+                                        onClick={() => handleVote(issue.id, Vote.FOR)}
+                                        color="success"
+                                    >
+                                        {voteIsPending ? 'Voting...' : 'Vote For'}
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleVote(issue.id, Vote.AGAINST)}
+                                        color="error"
+                                    >
+                                        {voteIsPending ? 'Voting...' : 'Vote Against'}
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleVote(issue.id, Vote.ABSTAIN)}
+                                        color="info"
+                                    >
+                                        {voteIsPending ? 'Voting...' : 'Abstain'}
+                                    </Button>
+                                </ButtonGroup>
+                            )}
                         </Grid2>
                     </Grid2>
                 </Paper>
