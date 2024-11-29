@@ -153,16 +153,18 @@ export function IssueList() {
         <>
             {selectedIssue !== null && issues.length > 0 && 
                 <IssueDetails issue={issues.find(issue => issue.id === selectedIssue)!} />}
-            <Paper elevation={0} sx={{ p: 3, width: '100%' }}>
+            <Paper elevation={0} sx={{ p: 3, width: '100%', height: '500px', display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6">
                         All Issues
                     </Typography>
                     <CreateIssueDialog />
                 </Box>
-                <Grid2 container>
-                    {renderIssues()}
-                </Grid2>
+                <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+                    <Grid2 container>
+                        {renderIssues()}
+                    </Grid2>
+                </Box>
             </Paper>
         </>
     );
