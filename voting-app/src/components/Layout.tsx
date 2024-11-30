@@ -5,23 +5,18 @@ import { TokenBalance } from './TokenBalance';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      height: '100vh',
-      overflow: 'hidden'
-    }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <AppBar position="static">
-        <Toolbar sx={{ height: '64px' }}>
+        <Toolbar sx={{ height: '64px', justifyContent: 'space-between' }}>
           <Link href="/" passHref>
             <Typography variant="h6" component="div" sx={{ cursor: 'pointer' }}>
               Voting dApp
             </Typography>
           </Link>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginLeft: 'auto' }}>
+          <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
             <TokenBalance />
-            <ConnectButton />
           </Box>
+          <ConnectButton />
         </Toolbar>
       </AppBar>
       <Container 
