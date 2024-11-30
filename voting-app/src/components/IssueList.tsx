@@ -107,7 +107,14 @@ export function IssueList() {
                 >
                     <Grid2 container>
                         <Grid2 size={11}>
-                            <Typography variant="h6">
+                            <Typography 
+                                variant="h6" 
+                                sx={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}
+                            >
                                 {issue.issueDesc}
                             </Typography>
                         </Grid2>
