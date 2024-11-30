@@ -80,7 +80,7 @@ export function TokenBalance() {
                 gap: 2 
             }}>
                 <Typography variant="h6" sx={{ color: 'text.secondary' }}>
-                    Token Balance:
+                    Tokens:
                 </Typography>
                 <TokenValue variant="h6">
                     <CountUp 
