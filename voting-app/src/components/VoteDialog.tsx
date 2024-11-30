@@ -98,7 +98,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                 <strong>Please select your voting position for issue:</strong>
                             </DialogContentText>
                             <DialogContentText sx={{ pl: 2, my: 2 }}>
-                                "{issue.issueDesc}"
+                                {`"${issue.issueDesc}"`}
                             </DialogContentText>
                         </>
                     )}
