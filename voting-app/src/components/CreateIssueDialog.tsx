@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { ClaimButton } from './ClaimButton';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface IssueFormData {
   issueDesc: string;
@@ -14,6 +15,7 @@ interface IssueFormData {
 }
 
 function useIssueCreation() {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '100' });
   const [open, setOpen] = useState(false);
 
@@ -33,6 +35,7 @@ function useIssueCreation() {
   }, [isSuccess]);
 
   return {
+    queryClient,
     formData,
     setFormData,
     open,
@@ -43,11 +46,11 @@ function useIssueCreation() {
 }
 
 export function CreateIssueDialog() {
-  const { formData, setFormData, open, setOpen, writeContract, isPending } = useIssueCreation();
+  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending } = useIssueCreation();
   const { address, isConnected } = useAccount();
   const [isTokensClaimed, setIsTokensClaimed] = useState(false);
 
-  const { data: hasClaimedData } = useReadContract({
+  const { data: hasClaimedData, queryKey: hasClaimedQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
     abi: weightedVoting.abi,
     functionName: "hasClaimed",
@@ -57,6 +60,16 @@ export function CreateIssueDialog() {
 
   useEffect(() => {
     setIsTokensClaimed(!!hasClaimedData);
+
+    const handleTokenClaimed = () => {
+      queryClient.invalidateQueries({ queryKey: hasClaimedQueryKey });
+    };
+    
+    window.addEventListener('tokensClaimed', handleTokenClaimed);
+
+    return () => {
+      window.removeEventListener('tokensClaimed', handleTokenClaimed);
+    };
   }, [hasClaimedData]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

@@ -2,6 +2,7 @@ import { useWriteContract, useSimulateContract, useAccount } from 'wagmi';
 import { Button } from '@mui/material';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import { useEffect } from 'react';
 
 export function ClaimButton() {
     const { isConnected } = useAccount();
@@ -15,7 +16,13 @@ export function ClaimButton() {
         }
     });
 
-    const { writeContract: claim, isPending: claimIsPending } = useWriteContract();
+    const { writeContract: claim, isPending: claimIsPending, isSuccess: claimIsSuccess } = useWriteContract();
+
+    useEffect(() => {
+        if (claimIsSuccess) {
+            window.dispatchEvent(new Event('tokensClaimed'));
+        }
+    }, [claimIsSuccess]);
 
     const handleClaimClick = () => {
         if (!isConnected || !claimData) {
