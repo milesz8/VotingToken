@@ -23,6 +23,20 @@ export function TokenBalance() {
         });
 
     useEffect(() => {
+        const handleEvent = () => queryClient.invalidateQueries({ queryKey: balanceQueryKey });
+        
+        window.addEventListener('tokensClaimed', handleEvent);
+        window.addEventListener('issueCreated', handleEvent);
+        window.addEventListener('voteCast', handleEvent);
+        
+        return () => {
+            window.removeEventListener('tokensClaimed', handleEvent);
+            window.removeEventListener('issueCreated', handleEvent);
+            window.removeEventListener('voteCast', handleEvent);
+        };
+    }, [queryClient, balanceQueryKey]);
+
+    useEffect(() => {
         if (balanceIsError) {
             console.error('Error getting balance:', balanceIsError);
             setTokenBalance(0);

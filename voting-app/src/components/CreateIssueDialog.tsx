@@ -48,8 +48,6 @@ function useIssueCreation() {
 export function CreateIssueDialog() {
   const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending } = useIssueCreation();
   const { address, isConnected } = useAccount();
-  const [isTokensClaimed, setIsTokensClaimed] = useState(false);
-
   const { data: hasClaimedData, queryKey: hasClaimedQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
     abi: weightedVoting.abi,
@@ -59,18 +57,14 @@ export function CreateIssueDialog() {
   });
 
   useEffect(() => {
-    setIsTokensClaimed(!!hasClaimedData);
-
     const handleTokenClaimed = () => {
       queryClient.invalidateQueries({ queryKey: hasClaimedQueryKey });
     };
-    
     window.addEventListener('tokensClaimed', handleTokenClaimed);
-
     return () => {
       window.removeEventListener('tokensClaimed', handleTokenClaimed);
     };
-  }, [hasClaimedData]);
+  }, [queryClient, hasClaimedQueryKey]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -102,7 +96,7 @@ export function CreateIssueDialog() {
         <DialogTitle>
           {!isConnected 
             ? 'Connect Wallet First' 
-            : !isTokensClaimed 
+            : !hasClaimedData 
               ? 'Claim Tokens First' 
               : 'Create Issue'}
         </DialogTitle>
@@ -112,7 +106,7 @@ export function CreateIssueDialog() {
               <p>You need to connect your wallet first.</p>
               <ConnectButton />
             </Box>
-          ) : !isTokensClaimed ? (
+          ) : !hasClaimedData ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
               <p>You need to claim tokens first.</p>
               <ClaimButton />
@@ -139,7 +133,7 @@ export function CreateIssueDialog() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          {isConnected && isTokensClaimed && (
+          {isConnected && (hasClaimedData as boolean) && (
             <Button type="submit" disabled={isPending}>
               {isPending ? 'Creating...' : 'Create'}
             </Button>

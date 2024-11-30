@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useReadContract, useWriteContract, useBlockNumber, useWaitForTransactionReceipt } from 'wagmi';
+import { useReadContract, useBlockNumber } from 'wagmi';
 import {
   Paper,
   Typography,
-  Button,
   Grid2,
-  ButtonGroup,
   Box,
   Select,
   MenuItem,
@@ -17,9 +15,9 @@ import { CheckCircle, Cancel } from '@mui/icons-material';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { Issue } from '../Models/Issue';
-import { Vote } from '../Models/Vote';
 import { CreateIssueDialog } from './CreateIssueDialog';
 import IssueDetails from './IssueDetails';
+import { VoteDialog } from './VoteDialog';
 
 const StatusIndicator = ({ passed }: { passed: boolean }) => (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -52,16 +50,6 @@ export function IssueList() {
         functionName: 'getAllIssues',
     });
 
-    const { 
-        writeContract: vote, 
-        isPending: voteIsPending, 
-        data: voteHash 
-    } = useWriteContract();
-
-    const { isSuccess: voteSuccess } = useWaitForTransactionReceipt({
-        hash: voteHash,
-    });
-
     useEffect(() => {
         if (triggerRead) {
             setTriggerRead(false);
@@ -76,10 +64,10 @@ export function IssueList() {
     }, [issuesData]);
 
     useEffect(() => {
-        if (voteSuccess) {
-            setTriggerRead(true);
-        }
-    }, [voteSuccess]);
+        const handleVoteCast = () => setTriggerRead(true);
+        window.addEventListener('voteCast', handleVoteCast);
+        return () => window.removeEventListener('voteCast', handleVoteCast);
+    }, []);
 
     useEffect(() => {
         const handleIssueCreated = () => setTriggerRead(true);
@@ -92,15 +80,6 @@ export function IssueList() {
             setSelectedIssue(issues[0].id);
         }
     }, [issues, selectedIssue]);
-
-    const handleVote = (issueId: number, voteType: Vote) => {
-        vote({
-            address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
-            abi: weightedVoting.abi,
-            functionName: "vote",
-            args: [BigInt(issueId), BigInt(voteType)],
-        });
-    };
 
     const getFilteredIssues = () => {
         switch (filterStatus) {
@@ -136,26 +115,7 @@ export function IssueList() {
                             {issue.closed ? (
                                 <StatusIndicator passed={issue.passed} />
                             ) : (
-                                <ButtonGroup variant="contained" disabled={voteIsPending}>
-                                    <Button 
-                                        onClick={() => handleVote(issue.id, Vote.FOR)}
-                                        color="success"
-                                    >
-                                        {voteIsPending ? 'Voting...' : 'Vote For'}
-                                    </Button>
-                                    <Button
-                                        onClick={() => handleVote(issue.id, Vote.AGAINST)}
-                                        color="error"
-                                    >
-                                        {voteIsPending ? 'Voting...' : 'Vote Against'}
-                                    </Button>
-                                    <Button
-                                        onClick={() => handleVote(issue.id, Vote.ABSTAIN)}
-                                        color="info"
-                                    >
-                                        {voteIsPending ? 'Voting...' : 'Abstain'}
-                                    </Button>
-                                </ButtonGroup>
+                                <VoteDialog issue={issue} />
                             )}
                         </Grid2>
                     </Grid2>
