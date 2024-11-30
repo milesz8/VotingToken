@@ -16,11 +16,17 @@ interface IssueFormData {
 
 function useIssueCreation() {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '100' });
+  const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '5' });
   const [open, setOpen] = useState(false);
 
   const { error, writeContract, isPending, data: hash } = useWriteContract();
   const { isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  const { data: totalSupply } = useReadContract({
+    address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+    abi: weightedVoting.abi,
+    functionName: "totalSupply",
+  });
 
   useEffect(() => {
     if (error) console.error('Error creating issue:', error);
@@ -28,7 +34,7 @@ function useIssueCreation() {
 
   useEffect(() => {
     if (isSuccess) {
-      setFormData({ issueDesc: '', quorum: '100' });
+      setFormData({ issueDesc: '', quorum: '5' });
       setOpen(false);
       window.dispatchEvent(new Event('issueCreated'));
     }
@@ -42,11 +48,12 @@ function useIssueCreation() {
     setOpen,
     writeContract,
     isPending,
+    totalSupply,
   };
 }
 
 export function CreateIssueDialog() {
-  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending } = useIssueCreation();
+  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply } = useIssueCreation();
   const { address, isConnected } = useAccount();
   const { data: hasClaimedData, queryKey: hasClaimedQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -66,10 +73,12 @@ export function CreateIssueDialog() {
     };
   }, [queryClient, hasClaimedQueryKey]);
 
+  const isQuorumValid = totalSupply ? BigInt(formData.quorum) <= (totalSupply as bigint) : true;
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!formData.issueDesc || !formData.quorum) return;
-
+    
     writeContract({
       address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
       abi: weightedVoting.abi,
@@ -123,10 +132,12 @@ export function CreateIssueDialog() {
               <TextField
                 fullWidth
                 type="number"
-                label="Quorum"
+                label={`Quorum (Total Supply: ${totalSupply?.toString() ?? 'Loading...'})`}
                 variant="outlined"
                 value={formData.quorum}
                 onChange={(e) => setFormData({ ...formData, quorum: e.target.value })}
+                error={!isQuorumValid}
+                helperText={!isQuorumValid ? `Quorum cannot exceed total supply (${totalSupply?.toString()})` : ''}
               />
             </Box>
           )}
@@ -134,7 +145,10 @@ export function CreateIssueDialog() {
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           {isConnected && (hasClaimedData as boolean) && (
-            <Button type="submit" disabled={isPending}>
+            <Button 
+              type="submit" 
+              disabled={isPending || !isQuorumValid}
+            >
               {isPending ? 'Creating...' : 'Create'}
             </Button>
           )}
