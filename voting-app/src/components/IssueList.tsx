@@ -187,21 +187,18 @@ export function IssueList() {
                 }}
             >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">
-                        All Issues
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                        <FormControl size="small">
+                    <FormControl size="small">
                             <Select
                                 value={filterStatus}
                                 onChange={(e) => setFilterStatus(e.target.value)}
                                 sx={{ minWidth: 120 }}
                             >
                                 <MenuItem value="all">All Issues</MenuItem>
-                                <MenuItem value="open">Open</MenuItem>
-                                <MenuItem value="closed">Closed</MenuItem>
-                            </Select>
-                        </FormControl>
+                                <MenuItem value="open">Open Issues</MenuItem>
+                                <MenuItem value="closed">Closed Issues</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
                         <CreateIssueDialog />
                     </Box>
                 </Box>
