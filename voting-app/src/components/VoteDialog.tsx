@@ -79,9 +79,9 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                     ) : (
                         <>
                             <DialogContentText id="vote-dialog-description">
-                                Please select your voting position for issue:
+                                <strong>Please select your voting position for issue:</strong>
                             </DialogContentText>
-                            <DialogContentText>
+                            <DialogContentText sx={{ pl: 2, my: 2 }}>
                                 "{issue.issueDesc}"
                             </DialogContentText>
                         </>
@@ -94,6 +94,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                 <Button
                                     onClick={() => handleVote(Vote.FOR)}
                                     color="success"
+                                    variant="contained"
                                     disabled={voteIsPending}
                                 >
                                     {voteIsPending ? 'Voting...' : 'Vote For'}
@@ -101,6 +102,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                 <Button
                                     onClick={() => handleVote(Vote.AGAINST)}
                                     color="error"
+                                    variant="contained"
                                     disabled={voteIsPending}
                                 >
                                     {voteIsPending ? 'Voting...' : 'Vote Against'}
@@ -108,6 +110,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                 <Button
                                     onClick={() => handleVote(Vote.ABSTAIN)}
                                     color="info"
+                                    variant="contained"
                                     disabled={voteIsPending}
                                 >
                                     {voteIsPending ? 'Voting...' : 'Abstain'}

@@ -106,12 +106,12 @@ export function IssueList() {
                     onClick={() => setSelectedIssue(issue.id)}
                 >
                     <Grid2 container>
-                        <Grid2 size={6}>
+                        <Grid2 size={11}>
                             <Typography variant="h6">
                                 {issue.issueDesc}
                             </Typography>
                         </Grid2>
-                        <Grid2 size={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Grid2 size={1} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             {issue.closed ? (
                                 <StatusIndicator passed={issue.passed} />
                             ) : (
@@ -127,14 +127,14 @@ export function IssueList() {
     return (
         <Box sx={{ 
             height: 'calc(100% - 40px)',
-            display: 'flex', 
+            display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             mb: 4
         }}>
             {selectedIssue !== null && issues.length > 0 && 
                 <IssueDetails issue={issues.find(issue => issue.id === selectedIssue)!} />}
-            <Paper 
+            <Paper
                 elevation={0} 
                 sx={{ 
                     p: 3, 

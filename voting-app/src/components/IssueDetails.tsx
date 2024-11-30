@@ -22,12 +22,22 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
             mb: 3, 
             p: 3, 
             width: '100%',
-            height: '180px'
+            minHeight: '180px'
         }}>
-            <Typography variant="h6" gutterBottom>{issue.issueDesc}</Typography>
+            <Typography 
+                variant="h6" 
+                gutterBottom 
+                sx={{
+                    wordWrap: 'break-word', 
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
+                }}
+            >
+                {issue.issueDesc}
+            </Typography>
             <Grid2 container spacing={2}>
-                <Grid2 size={12} sx={{ height: 100, mt: 2 }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                <Grid2 size={12} sx={{ minHeight: '100px' }}>
+                    <ResponsiveContainer width="100%" height={100}>
                         <BarChart 
                             data={voteData}
                             layout="vertical"
