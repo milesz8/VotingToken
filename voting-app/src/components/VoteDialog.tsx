@@ -19,6 +19,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
         args: isConnected ? [address] : undefined,
         query: { enabled: !!isConnected }
     });
+    
     const { 
         writeContract: vote,
         isPending: voteIsPending,
@@ -41,15 +42,30 @@ export function VoteDialog({ issue }: { issue: Issue }) {
         });
     };
 
+    // Add helper function to check if user has voted
+    const hasVoted = React.useMemo(() => {
+        return isConnected && address && issue.voters.includes(address);
+    }, [isConnected, address, issue.voters]);
+
     return (
         <>
-            <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={() => setOpen(true)}
-            >
-                Vote
-            </Button>
+            {hasVoted ? (
+                <Button 
+                    variant="outlined" 
+                    color="success" 
+                    disabled
+                >
+                    Voted ✓
+                </Button>
+            ) : (
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => setOpen(true)}
+                >
+                    Vote
+                </Button>
+            )}
             <Dialog
                 open={open}
                 onClose={() => setOpen(false)}
@@ -95,7 +111,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                     onClick={() => handleVote(Vote.FOR)}
                                     color="success"
                                     variant="contained"
-                                    disabled={voteIsPending}
+                                    disabled={voteIsPending || hasVoted}
                                 >
                                     {voteIsPending ? 'Voting...' : 'Vote For'}
                                 </Button>
@@ -103,7 +119,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                     onClick={() => handleVote(Vote.AGAINST)}
                                     color="error"
                                     variant="contained"
-                                    disabled={voteIsPending}
+                                    disabled={voteIsPending || hasVoted}
                                 >
                                     {voteIsPending ? 'Voting...' : 'Vote Against'}
                                 </Button>
@@ -111,7 +127,7 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                                     onClick={() => handleVote(Vote.ABSTAIN)}
                                     color="info"
                                     variant="contained"
-                                    disabled={voteIsPending}
+                                    disabled={voteIsPending || hasVoted}
                                 >
                                     {voteIsPending ? 'Voting...' : 'Abstain'}
                                 </Button>
