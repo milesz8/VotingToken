@@ -12,7 +12,7 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
             For: Number(issue.votesFor),
             Against: Number(issue.votesAgainst),
             Abstain: Number(issue.votesAbstain),
-            "Needed To Close": votesNeeded
+            "Votes To Close": votesNeeded
         }
     ];
     const COLORS = ['#4caf50', '#f44336', '#2196f3', '#9e9e9e'];
@@ -39,7 +39,7 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
                             <Bar dataKey="For" stackId="a" fill={COLORS[0]} />
                             <Bar dataKey="Against" stackId="a" fill={COLORS[1]} />
                             <Bar dataKey="Abstain" stackId="a" fill={COLORS[2]} />
-                            <Bar dataKey="Needed To Close" stackId="a" fill={COLORS[3]} />
+                            <Bar dataKey="Votes To Close" stackId="a" fill={COLORS[3]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </Grid2>
