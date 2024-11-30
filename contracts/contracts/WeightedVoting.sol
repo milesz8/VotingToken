@@ -14,7 +14,6 @@ contract WeightedVoting is ERC20 {
     }
 
     uint public maxSupply = 1000000;
-    uint public totalClaimed;
 
     error TokensClaimed();
     error AllTokensClaimed();
@@ -23,6 +22,8 @@ contract WeightedVoting is ERC20 {
     error AlreadyVoted();
     error VotingClosed();
     error InvalidVote();
+    error BalanceTooLow();
+
     struct Issue {
         uint256 id;
         EnumerableSet.AddressSet voters;
@@ -56,14 +57,13 @@ contract WeightedVoting is ERC20 {
     }
 
     function claim() external {
-        if (totalSupply() >= maxSupply) {
+        if (ERC20.totalSupply() >= maxSupply) {
             revert AllTokensClaimed();
         }
         if (_claimed[msg.sender]) {
             revert TokensClaimed();
         }
         ERC20._mint(msg.sender, 100);
-        totalClaimed += 100;
         _claimed[msg.sender] = true;
     }
 
@@ -78,6 +78,10 @@ contract WeightedVoting is ERC20 {
             revert NoTokensHeld();
         }
 
+        if (balanceOf(msg.sender) <= 10) {
+            revert BalanceTooLow();
+        }
+
         if (quorum > totalSupply()) {
             revert QuorumTooHigh();
         }
@@ -86,6 +90,9 @@ contract WeightedVoting is ERC20 {
         newIssue.issueDesc = issueDesc;
         newIssue.quorum = quorum;
         newIssue.id = issues.length - 1;
+
+        ERC20._burn(msg.sender, 10);
+
         return newIssue.id;
     }
 
@@ -115,18 +122,24 @@ contract WeightedVoting is ERC20 {
             revert AlreadyVoted();
         }
 
+        if (balanceOf(msg.sender) <= 1) {
+            revert BalanceTooLow();
+        }
+
         issue.voters.add(msg.sender);
-        issue.totalVotes += balanceOf(msg.sender);
+        issue.totalVotes += 1;
 
         if (_vote == Vote.FOR) {
-            issue.votesFor += balanceOf(msg.sender);
+            issue.votesFor += 1;
         } else if (_vote == Vote.AGAINST) {
-            issue.votesAgainst += balanceOf(msg.sender);
+            issue.votesAgainst += 1;
         } else if (_vote == Vote.ABSTAIN) {
-            issue.votesAbstain += balanceOf(msg.sender);
+            issue.votesAbstain += 1;
         } else {
             revert InvalidVote();
         }
+
+        ERC20._burn(msg.sender, 1);
 
         if (issue.totalVotes >= issue.quorum) {
             if (issue.votesAgainst < issue.votesFor) {
