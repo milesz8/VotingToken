@@ -33,7 +33,7 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
                             layout="vertical"
                         >
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis type="number" />
+                            <XAxis type="number" domain={[0, Number(issue.quorum)]} />
                             <YAxis dataKey="name" type="category" />
                             <Legend />
                             <Bar dataKey="For" stackId="a" fill={COLORS[0]} />
