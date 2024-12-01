@@ -106,7 +106,7 @@ export function IssueList() {
                     onClick={() => setSelectedIssue(issue.id)}
                 >
                     <Grid2 container>
-                        <Grid2 size={11}>
+                        <Grid2 size={9}>
                             <Typography 
                                 variant="h6" 
                                 sx={{
@@ -118,7 +118,7 @@ export function IssueList() {
                                 {issue.issueDesc}
                             </Typography>
                         </Grid2>
-                        <Grid2 size={1} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Grid2 size={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             {issue.closed ? (
                                 <StatusIndicator passed={issue.passed} />
                             ) : (

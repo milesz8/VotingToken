@@ -38,7 +38,7 @@ export default function IssueDetails({ issue }: { issue: Issue }) {
             <Grid2 container spacing={2}>
                 <Grid2 size={12} sx={{ minHeight: '100px' }}>
                     <ResponsiveContainer width="100%" height={100}>
-                        <BarChart 
+                        <BarChart
                             data={voteData}
                             layout="vertical"
                         >

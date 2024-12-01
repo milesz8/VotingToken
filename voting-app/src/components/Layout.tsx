@@ -13,9 +13,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               Voting dApp
             </Typography>
           </Link>
-          <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-            <TokenBalance />
-          </Box>
+          <TokenBalance />
           <ConnectButton />
         </Toolbar>
       </AppBar>

@@ -7,6 +7,8 @@ import { Box, Typography } from '@mui/material';
 import CountUp from 'react-countup';
 import { keyframes } from '@emotion/react';
 import { styled } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 const pulseAnimation = keyframes`
   0% { transform: scale(1); }
@@ -26,6 +28,8 @@ export function TokenBalance() {
     const { data: blockNumber } = useBlockNumber({ watch: true });
     const [tokenBalance, setTokenBalance] = useState(0);
     const { address } = useAccount();
+    const theme = useTheme();
+    const isAboveSmall = useMediaQuery(theme.breakpoints.up('sm'));
 
     const { error: balanceIsError, data: balanceData, queryKey: balanceQueryKey } = 
         useReadContract({ 
@@ -79,9 +83,11 @@ export function TokenBalance() {
                 justifyContent: 'center', 
                 gap: 2 
             }}>
-                <Typography variant="h6" sx={{ color: 'text.secondary' }}>
-                    Tokens:
-                </Typography>
+                {isAboveSmall && (
+                    <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+                        Tokens:
+                    </Typography>
+                )}
                 <TokenValue variant="h6">
                     <CountUp 
                         end={tokenBalance} 

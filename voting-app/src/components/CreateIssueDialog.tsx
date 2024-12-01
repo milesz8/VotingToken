@@ -107,7 +107,7 @@ export function CreateIssueDialog() {
             ? 'Connect Wallet First' 
             : !hasClaimedData 
               ? 'Claim Tokens First' 
-              : 'Create Issue'}
+              : 'Create Issue - cost 5 tokens'}
         </DialogTitle>
         <DialogContent>
           {!isConnected ? (
