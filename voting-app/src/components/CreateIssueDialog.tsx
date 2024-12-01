@@ -21,11 +21,18 @@ function useIssueCreation() {
 
   const { error, writeContract, isPending, data: hash } = useWriteContract();
   const { isSuccess } = useWaitForTransactionReceipt({ hash });
-
+  const { address } = useAccount();
   const { data: totalSupply } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
     abi: weightedVoting.abi,
     functionName: "totalSupply",
+  });
+
+  const { data: balance } = useReadContract({
+    address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+    abi: weightedVoting.abi,
+    functionName: "balanceOf",
+    args: [address],
   });
 
   useEffect(() => {
@@ -49,11 +56,12 @@ function useIssueCreation() {
     writeContract,
     isPending,
     totalSupply,
+    balance,
   };
 }
 
 export function CreateIssueDialog() {
-  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply } = useIssueCreation();
+  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply, balance } = useIssueCreation();
   const { address, isConnected } = useAccount();
   const { data: hasClaimedData, queryKey: hasClaimedQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -74,6 +82,8 @@ export function CreateIssueDialog() {
   }, [queryClient, hasClaimedQueryKey]);
 
   const isQuorumValid = totalSupply ? BigInt(formData.quorum) <= (totalSupply as bigint) : true;
+
+  const hasEnoughTokens = balance ? (balance as bigint) >= BigInt(5) : false;
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -107,7 +117,9 @@ export function CreateIssueDialog() {
             ? 'Connect Wallet First' 
             : !hasClaimedData 
               ? 'Claim Tokens First' 
-              : 'Create Issue - cost 5 tokens'}
+              : !hasEnoughTokens
+                ? 'Insufficient Balance'
+                : 'Create Issue Cost: ◎5'}
         </DialogTitle>
         <DialogContent>
           {!isConnected ? (
@@ -119,6 +131,10 @@ export function CreateIssueDialog() {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
               <p>You need to claim tokens first.</p>
               <ClaimButton />
+            </Box>
+          ) : !hasEnoughTokens ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+              <p>You need at least ◎5 to create an issue. Current balance: ◎{balance?.toString() ?? '0'}</p>
             </Box>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -144,7 +160,7 @@ export function CreateIssueDialog() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          {isConnected && (hasClaimedData as boolean) && (
+          {isConnected && (hasClaimedData as boolean) && hasEnoughTokens && (
             <Button 
               type="submit" 
               disabled={isPending || !isQuorumValid}

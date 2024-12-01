@@ -25,7 +25,6 @@ const TokenValue = styled(Typography)(({ theme }) => ({
 
 export function TokenBalance() {
     const queryClient = useQueryClient();
-    const { data: blockNumber } = useBlockNumber({ watch: true });
     const [tokenBalance, setTokenBalance] = useState(0);
     const { address } = useAccount();
     const theme = useTheme();
@@ -71,10 +70,6 @@ export function TokenBalance() {
         }
     }, [balanceData]);
 
-    useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: balanceQueryKey});
-    }, [blockNumber, balanceQueryKey, queryClient]);
-
     return (
         <Box sx={{ textAlign: 'center' }}>
             <Box sx={{ 
@@ -85,7 +80,7 @@ export function TokenBalance() {
             }}>
                 {isAboveSmall && (
                     <Typography variant="h6" sx={{ color: 'text.secondary' }}>
-                        Tokens:
+                        Balance:
                     </Typography>
                 )}
                 <TokenValue variant="h6">

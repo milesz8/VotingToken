@@ -94,7 +94,7 @@ export function IssueList() {
 
     function renderIssues() {
         return getFilteredIssues().map((issue) => (
-            <Grid2 size={12} key={issue.issueDesc}>
+            <Grid2 size={12} key={issue.id}>
                 <Paper 
                     elevation={3} 
                     sx={{ 
