@@ -78,7 +78,7 @@ contract WeightedVoting is ERC20 {
             revert NoTokensHeld();
         }
 
-        if (balanceOf(msg.sender) <= 10) {
+        if (balanceOf(msg.sender) <= 5) {
             revert BalanceTooLow();
         }
 
@@ -91,7 +91,7 @@ contract WeightedVoting is ERC20 {
         newIssue.quorum = quorum;
         newIssue.id = issues.length - 1;
 
-        ERC20._burn(msg.sender, 10);
+        ERC20._burn(msg.sender, 5);
 
         return newIssue.id;
     }
