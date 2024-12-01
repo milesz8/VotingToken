@@ -41,11 +41,18 @@ export function VoteDialog({ issue }: { issue: Issue }) {
             args: [BigInt(issue.id), BigInt(voteType)],
         });
     };
-
-    // Add helper function to check if user has voted
     const hasVoted = React.useMemo(() => {
         return isConnected && address && issue.voters.includes(address);
     }, [isConnected, address, issue.voters]);
+
+    const { data: balance } = useReadContract({
+        address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
+        abi: weightedVoting.abi,
+        functionName: "balanceOf",
+        args: [address],
+    });
+
+    const hasEnoughTokens = balance ? (balance as bigint) >= BigInt(1) : false;
 
     return (
         <>
@@ -78,8 +85,10 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                     {!isConnected 
                         ? 'Connect Wallet First' 
                         : !hasClaimedData 
-                            ? 'Claim Tokens First' 
-                            : 'Cast Your Vote'}
+                            ? 'Claim Tokens First'
+                            : !hasEnoughTokens
+                                ? 'Insufficient Balance'
+                            : 'Cast Your Vote: ◎1'}
                 </DialogTitle>
                 <DialogContent>
                     {!isConnected ? (
@@ -92,20 +101,24 @@ export function VoteDialog({ issue }: { issue: Issue }) {
                             <DialogContentText>You need to claim tokens first.</DialogContentText>
                             <ClaimButton />
                         </Box>
+                    ) : !hasEnoughTokens ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                            <DialogContentText>You need at least ◎1 to vote. Current balance: ◎{balance?.toString() ?? '0'}</DialogContentText>
+                        </Box>
                     ) : (
                         <>
                             <DialogContentText id="vote-dialog-description">
                                 <strong>Please select your voting position for issue:</strong>
                             </DialogContentText>
                             <DialogContentText sx={{ pl: 2, my: 2 }}>
-                                {`"${issue.issueDesc}"`}
+                                {`${issue.issueDesc}`}
                             </DialogContentText>
                         </>
                     )}
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}>
                     <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', gap: 1 }}>
-                        {!!isConnected && !!hasClaimedData && (
+                        {!!isConnected && !!hasClaimedData && hasEnoughTokens && (
                             <>
                                 <Button
                                     onClick={() => handleVote(Vote.FOR)}
