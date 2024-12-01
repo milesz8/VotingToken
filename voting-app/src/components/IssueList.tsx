@@ -39,8 +39,6 @@ export function IssueList() {
     const [selectedIssue, setSelectedIssue] = useState<number | null>(null);
     const [filterStatus, setFilterStatus] = useState('all');
 
-    const { data: blockNumber } = useBlockNumber({ watch: triggerRead });
-
     const {
         data: issuesData,
         queryKey: issuesQueryKey,
@@ -55,7 +53,7 @@ export function IssueList() {
             setTriggerRead(false);
             queryClient.invalidateQueries({ queryKey: issuesQueryKey });
         }
-    }, [blockNumber, queryClient, triggerRead, issuesQueryKey]);
+    }, [queryClient, triggerRead, issuesQueryKey]);
 
     useEffect(() => {
         if (issuesData) {
