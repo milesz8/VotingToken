@@ -11,6 +11,10 @@ const config: HardhatUserConfig = {
       url: 'https://sepolia.base.org',
       accounts: [SEPOLIA_PRIVATE_KEY],
     },
+    base: {
+      url: 'https://mainnet.base.org',
+      accounts: [SEPOLIA_PRIVATE_KEY],
+    },
   },
   typechain: {
     outDir: "typechain-types",
