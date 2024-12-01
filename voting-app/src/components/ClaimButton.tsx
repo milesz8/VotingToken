@@ -1,11 +1,14 @@
-import { useWriteContract, useSimulateContract, useAccount } from 'wagmi';
+import { useWriteContract, useSimulateContract, useAccount, useChainId } from 'wagmi';
 import { Button } from '@mui/material';
 import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
 import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
 import { useEffect } from 'react';
+import { waitForTransactionReceipt } from 'wagmi/actions';
+import { configReown } from '../wagmi';
 
 export function ClaimButton() {
     const { isConnected } = useAccount();
+    const chainId = useChainId();
     
     const { data: claimData, isError: claimIsError } = useSimulateContract({
         address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -16,13 +19,21 @@ export function ClaimButton() {
         }
     });
 
-    const { writeContract: claim, isPending: claimIsPending, isSuccess: claimIsSuccess } = useWriteContract();
+    const { writeContract: claim, isPending: claimIsPending, isSuccess: claimIsSuccess, data: txHash } = useWriteContract();
 
     useEffect(() => {
-        if (claimIsSuccess) {
-            window.dispatchEvent(new Event('tokensClaimed'));
+        if (claimIsSuccess && txHash) {
+            // Wait for transaction to be confirmed
+            waitForTransactionReceipt(configReown, { 
+                hash: txHash,
+                confirmations: 1
+            })
+                .then(() => {
+                    window.dispatchEvent(new Event('tokensClaimed'));
+                })
+                .catch(console.error);
         }
-    }, [claimIsSuccess]);
+    }, [claimIsSuccess, txHash]);
 
     const handleClaimClick = () => {
         if (!isConnected || !claimData) {

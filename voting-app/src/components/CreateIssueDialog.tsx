@@ -22,11 +22,25 @@ function useIssueCreation() {
   const { error, writeContract, isPending, data: hash } = useWriteContract();
   const { isSuccess } = useWaitForTransactionReceipt({ hash });
   const { address } = useAccount();
-  const { data: totalSupply } = useReadContract({
+  const { data: totalSupply, queryKey: totalSupplyQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
     abi: weightedVoting.abi,
     functionName: "totalSupply",
   });
+
+    useEffect(() => {
+      const handleEvent = () => queryClient.invalidateQueries({ queryKey: totalSupplyQueryKey });
+      
+      window.addEventListener('tokensClaimed', handleEvent);
+      window.addEventListener('issueCreated', handleEvent);
+      window.addEventListener('voteCast', handleEvent);
+      
+      return () => {
+          window.removeEventListener('tokensClaimed', handleEvent);
+          window.removeEventListener('issueCreated', handleEvent);
+          window.removeEventListener('voteCast', handleEvent);
+      };
+  }, [queryClient, totalSupplyQueryKey]);
 
   const { data: balance } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -113,7 +127,7 @@ export function CreateIssueDialog() {
         }}
       >
         <DialogTitle>
-          {!isConnected 
+          {!isConnected
             ? 'Connect Wallet First' 
             : !hasClaimedData 
               ? 'Claim Tokens First' 

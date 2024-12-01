@@ -8,6 +8,8 @@ import { Issue } from '../Models/Issue';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Box } from '@mui/material';
 import { ClaimButton } from './ClaimButton';
+import { waitForTransactionReceipt } from 'wagmi/actions';
+import { configReown } from '../wagmi';
 
 export function VoteDialog({ issue }: { issue: Issue }) {
     const [open, setOpen] = React.useState(false);
@@ -23,15 +25,23 @@ export function VoteDialog({ issue }: { issue: Issue }) {
     const { 
         writeContract: vote,
         isPending: voteIsPending,
-        isSuccess: voteSuccess
+        isSuccess: voteSuccess,
+        data: txHash
     } = useWriteContract();
 
     React.useEffect(() => {
-        if (voteSuccess) {
-            window.dispatchEvent(new Event('voteCast'));
-            setOpen(false);
+        if (voteSuccess && txHash) {
+            waitForTransactionReceipt(configReown, { 
+                hash: txHash,
+                confirmations: 1
+            })
+                .then(() => {
+                    window.dispatchEvent(new Event('voteCast'));
+                    setOpen(false);
+                })
+                .catch(console.error);
         }
-    }, [voteSuccess]);
+    }, [voteSuccess, txHash]);
 
     const handleVote = (voteType: Vote) => {
         vote({
