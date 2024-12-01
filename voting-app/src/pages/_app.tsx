@@ -11,6 +11,7 @@ import { theme } from '../theme/theme';
 import { Layout } from '../components/Layout';
 
 import { configReown } from '../wagmi';
+import { base } from 'wagmi/chains';
 
 const client = new QueryClient();
 
@@ -20,7 +21,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       <CssBaseline />
       <WagmiProvider config={configReown}>
         <QueryClientProvider client={client}>
-          <RainbowKitProvider>
+          <RainbowKitProvider
+            initialChain={base}
+            showRecentTransactions={true}
+          >
             <Layout>
               <Component {...pageProps} />
             </Layout>

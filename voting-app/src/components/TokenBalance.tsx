@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useAccount, useReadContract, useBlockNumber } from 'wagmi';
-import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
-import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import { useAccount, useReadContract } from 'wagmi';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-8453/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-8453/deployed_addresses.json';
 import { useQueryClient } from '@tanstack/react-query';
 import { Box, Typography } from '@mui/material';
 import CountUp from 'react-countup';

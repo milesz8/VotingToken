@@ -4,8 +4,8 @@ import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadCont
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Box, Fab, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
-import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-8453/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-8453/deployed_addresses.json';
 import { ClaimButton } from './ClaimButton';
 import { useQueryClient } from '@tanstack/react-query';
 

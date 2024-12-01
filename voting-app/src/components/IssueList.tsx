@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useReadContract, useBlockNumber } from 'wagmi';
+import { useReadContract } from 'wagmi';
 import {
   Paper,
   Typography,
@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import { CheckCircle, Cancel } from '@mui/icons-material';
 
-import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
-import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-8453/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-8453/deployed_addresses.json';
 import { Issue } from '../Models/Issue';
 import { CreateIssueDialog } from './CreateIssueDialog';
 import IssueDetails from './IssueDetails';

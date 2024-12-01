@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useWriteContract, useAccount, useReadContract } from 'wagmi';
-import weightedVoting from '../../../contracts/ignition/deployments/chain-84532/artifacts/WeightedVotingModule#WeightedVoting.json';
-import deployedAddresses from '../../../contracts/ignition/deployments/chain-84532/deployed_addresses.json';
+import weightedVoting from '../../../contracts/ignition/deployments/chain-8453/artifacts/WeightedVotingModule#WeightedVoting.json';
+import deployedAddresses from '../../../contracts/ignition/deployments/chain-8453/deployed_addresses.json';
 import { Vote } from '../Models/Vote';
 import { Issue } from '../Models/Issue';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
