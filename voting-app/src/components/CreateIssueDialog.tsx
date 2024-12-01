@@ -20,8 +20,10 @@ function useIssueCreation() {
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { error, writeContract, isPending, data: hash } = useWriteContract();
-  const { isSuccess, isPending: isPendingSuccess } = useWaitForTransactionReceipt({ hash });
+  const { error, writeContract, isPending, data: writeContractData } = useWriteContract();
+  const { isSuccess, isPending: isPendingSuccess } = useWaitForTransactionReceipt({ 
+    hash: writeContractData 
+  });
   const { address } = useAccount();
   const { data: totalSupply, queryKey: totalSupplyQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -78,6 +80,8 @@ function useIssueCreation() {
     setOpen,
     writeContract,
     isPending,
+    isPendingSuccess,
+    writeContractData,
     totalSupply,
     balance,
     errorMessage,
@@ -86,7 +90,7 @@ function useIssueCreation() {
 }
 
 export function CreateIssueDialog() {
-  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply, balance, errorMessage, setErrorMessage } = useIssueCreation();
+  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply, balance, errorMessage, setErrorMessage, isPendingSuccess, writeContractData } = useIssueCreation();
   const { address, isConnected } = useAccount();
   const { data: hasClaimedData, queryKey: hasClaimedQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -198,9 +202,9 @@ export function CreateIssueDialog() {
           {isConnected && (hasClaimedData as boolean) && hasEnoughTokens && (
             <Button 
               type="submit" 
-              disabled={isPending || !isQuorumValid}
+              disabled={isPending || !isQuorumValid || (isPendingSuccess && !!writeContractData)}
             >
-              {isPending ? 'Creating...' : 'Create'}
+              {isPending ? 'Creating...' : isPendingSuccess && !!writeContractData ? 'Processing...' : 'Create'}
             </Button>
           )}
         </DialogActions>
