@@ -18,9 +18,10 @@ function useIssueCreation() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<IssueFormData>({ issueDesc: '', quorum: '5' });
   const [open, setOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { error, writeContract, isPending, data: hash } = useWriteContract();
-  const { isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { isSuccess, isPending: isPendingSuccess } = useWaitForTransactionReceipt({ hash });
   const { address } = useAccount();
   const { data: totalSupply, queryKey: totalSupplyQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -50,12 +51,20 @@ function useIssueCreation() {
   });
 
   useEffect(() => {
-    if (error) console.error('Error creating issue:', error);
+    if (error) {
+      if (error.message.includes('User denied transaction')) {
+        setErrorMessage('Transaction was cancelled');
+      } else {
+        setErrorMessage('Error creating issue. Please try again.');
+        console.error('Error creating issue:', error);
+      }
+    }
   }, [error]);
 
   useEffect(() => {
     if (isSuccess) {
       setFormData({ issueDesc: '', quorum: '5' });
+      setErrorMessage(null);
       setOpen(false);
       window.dispatchEvent(new Event('issueCreated'));
     }
@@ -71,11 +80,13 @@ function useIssueCreation() {
     isPending,
     totalSupply,
     balance,
+    errorMessage,
+    setErrorMessage,
   };
 }
 
 export function CreateIssueDialog() {
-  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply, balance } = useIssueCreation();
+  const { queryClient, formData, setFormData, open, setOpen, writeContract, isPending, totalSupply, balance, errorMessage, setErrorMessage } = useIssueCreation();
   const { address, isConnected } = useAccount();
   const { data: hasClaimedData, queryKey: hasClaimedQueryKey } = useReadContract({
     address: deployedAddresses['WeightedVotingModule#WeightedVoting'] as `0x${string}`,
@@ -136,6 +147,11 @@ export function CreateIssueDialog() {
                 : 'Create Issue Cost: ◎5'}
         </DialogTitle>
         <DialogContent>
+          {errorMessage && (
+            <Box sx={{ color: 'error.main', mb: 2 }}>
+              {errorMessage}
+            </Box>
+          )}
           {!isConnected ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 2 }}>
               <p>You need to connect your wallet first.</p>
@@ -173,7 +189,12 @@ export function CreateIssueDialog() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => {
+            setOpen(false);
+            setErrorMessage(null);
+          }}>
+            Cancel
+          </Button>
           {isConnected && (hasClaimedData as boolean) && hasEnoughTokens && (
             <Button 
               type="submit" 
